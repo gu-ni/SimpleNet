@@ -10,6 +10,7 @@ import logging
 import os
 import pickle
 from collections import OrderedDict
+import psutil
 
 import math
 import numpy as np
@@ -669,6 +670,56 @@ class SimpleNet(torch.nn.Module):
             image_transform=image_transform,
             mask_transform=mask_transform,
         )
+        
+        
+    def save(self, path):
+        """Save only necessary modules and parameters for continual learning."""
+        state = {}
+
+        # Save backbone
+        if hasattr(self, 'backbone'):
+            state['backbone'] = self.backbone.state_dict()
+
+        # Save pre-projection layer
+        if hasattr(self, 'pre_proj') and self.pre_proj > 0 and hasattr(self, 'pre_projection'):
+            state['pre_projection'] = self.pre_projection.state_dict()
+
+        # Save discriminator
+        if hasattr(self, 'discriminator'):
+            state['discriminator'] = self.discriminator.state_dict()
+
+        # Save any important config if necessary (optional)
+        state['meta_epochs'] = self.meta_epochs
+        state['embedding_size'] = self.embedding_size
+
+        torch.save(state, path)
+        LOGGER.info(f"Saved SimpleNet checkpoint to {path}")
+
+
+    def load_checkpoint(self, path):
+        """Load saved model components for continual learning."""
+        checkpoint = torch.load(path, map_location=self.device)
+
+        if 'backbone' in checkpoint:
+            self.backbone.load_state_dict(checkpoint['backbone'])
+            LOGGER.info("Loaded backbone from checkpoint")
+
+        if 'pre_projection' in checkpoint and hasattr(self, 'pre_projection'):
+            self.pre_projection.load_state_dict(checkpoint['pre_projection'])
+            LOGGER.info("Loaded pre_projection from checkpoint")
+
+        if 'discriminator' in checkpoint:
+            self.discriminator.load_state_dict(checkpoint['discriminator'])
+            LOGGER.info("Loaded discriminator from checkpoint")
+
+        # Optional: restore training configs
+        if 'meta_epochs' in checkpoint:
+            self.meta_epochs = checkpoint['meta_epochs']
+
+        if 'embedding_size' in checkpoint:
+            self.embedding_size = checkpoint['embedding_size']
+        
+        
 
 # Image handling classes.
 class PatchMaker:

@@ -8,6 +8,7 @@
 import logging
 import os
 import sys
+import json
 
 import click
 import numpy as np
@@ -19,6 +20,9 @@ import common
 import metrics
 import simplenet 
 import utils
+
+from datasets.continual_datasets import JSONContinualDataset
+import torchvision.transforms as transforms
 
 LOGGER = logging.getLogger(__name__)
 
@@ -36,6 +40,8 @@ _DATASETS = {
 @click.option("--run_name", type=str, default="test")
 @click.option("--test", is_flag=True)
 @click.option("--save_segmentation_images", is_flag=True, default=False, show_default=True)
+@click.option("--base_checkpoint", type=str, default=None, help="Path to base checkpoint to load.")
+@click.option("--save_checkpoint", type=str, default=None, help="Directory to save checkpoints after training.")
 def main(**kwargs):
     pass
 
@@ -50,7 +56,9 @@ def run(
     log_project,
     run_name,
     test,
-    save_segmentation_images
+    save_segmentation_images,
+    base_checkpoint,
+    save_checkpoint,
 ):
     methods = {key: item for (key, item) in methods}
 
@@ -83,6 +91,18 @@ def run(
         models_dir = os.path.join(run_save_path, "models")
         os.makedirs(models_dir, exist_ok=True)
         for i, SimpleNet in enumerate(simplenet_list):
+            
+            # Load base checkpoint if provided
+            if base_checkpoint is not None:
+                checkpoint_path = os.path.join(base_checkpoint, f"{dataset_name}_{i}.pth")
+                if os.path.exists(checkpoint_path):
+                    LOGGER.info(f"Loading checkpoint from {checkpoint_path}")
+                    SimpleNet.load_checkpoint(checkpoint_path)
+                else:
+                    LOGGER.warning(f"Checkpoint path not found: {checkpoint_path}")
+
+            
+            
             # torch.cuda.empty_cache()
             if SimpleNet.backbone.seed is not None:
                 utils.fix_seeds(SimpleNet.backbone.seed, device)
@@ -107,6 +127,14 @@ def run(
                     "anomaly_pixel_auroc": pro_auroc,
                 }
             )
+
+            # Save checkpoint if requested
+            if save_checkpoint is not None:
+                save_path = os.path.join(save_checkpoint, f"{dataset_name}_{i}.pth")
+                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+                SimpleNet.save(save_path)
+                LOGGER.info(f"Saved checkpoint to {save_path}")
+
 
             for key, item in result_collect[-1].items():
                 if key != "dataset_name":
@@ -224,9 +252,9 @@ def net(
 
 
 @main.command("dataset")
-@click.argument("name", type=str)
-@click.argument("data_path", type=click.Path(exists=True, file_okay=False))
-@click.option("--subdatasets", "-d", multiple=True, type=str, required=True)
+@click.argument("name", type=str, required=False)
+@click.argument("data_path", type=click.Path(exists=True, file_okay=False), required=False)
+@click.option("--subdatasets", "-d", multiple=True, type=str, required=False, default=[])
 @click.option("--train_val_split", type=float, default=1, show_default=True)
 @click.option("--batch_size", default=2, type=int, show_default=True)
 @click.option("--num_workers", default=2, type=int, show_default=True)
@@ -242,6 +270,8 @@ def net(
 @click.option("--hflip", default=0.0, type=float)
 @click.option("--vflip", default=0.0, type=float)
 @click.option("--augment", is_flag=True)
+@click.option("--json_path", type=str, default=None, help="Path to class/task json file for continual learning.")
+@click.option("--task", type=str, default=None, help="Specify which task to load.")
 def dataset(
     name,
     data_path,
@@ -261,43 +291,34 @@ def dataset(
     hflip,
     vflip,
     augment,
+    json_path,
+    task,
 ):
-    dataset_info = _DATASETS[name]
-    dataset_library = __import__(dataset_info[0], fromlist=[dataset_info[1]])
+    if json_path is None and (name is None or data_path is None):
+        raise ValueError("Either --json_path or both positional arguments (name, data_path) must be provided.")
 
     def get_dataloaders(seed):
-        dataloaders = []
-        for subdataset in subdatasets:
-            train_dataset = dataset_library.__dict__[dataset_info[1]](
-                data_path,
-                classname=subdataset,
-                resize=resize,
-                train_val_split=train_val_split,
-                imagesize=imagesize,
-                split=dataset_library.DatasetSplit.TRAIN,
-                seed=seed,
-                rotate_degrees=rotate_degrees,
-                translate=translate,
-                brightness_factor=brightness,
-                contrast_factor=contrast,
-                saturation_factor=saturation,
-                gray_p=gray,
-                h_flip_p=hflip,
-                v_flip_p=vflip,
-                scale=scale,
-                augment=augment,
-            )
+        if json_path is not None:
+            with open(json_path, 'r') as f:
+                full_data = json.load(f)
 
-            test_dataset = dataset_library.__dict__[dataset_info[1]](
-                data_path,
-                classname=subdataset,
-                resize=resize,
-                imagesize=imagesize,
-                split=dataset_library.DatasetSplit.TEST,
-                seed=seed,
-            )
-            
-            LOGGER.info(f"Dataset: train={len(train_dataset)} test={len(test_dataset)}")
+            if task is not None:
+                if task not in full_data:
+                    raise ValueError(f"Task '{task}' not found in {json_path}")
+                train_data = full_data[task]["train"]
+                test_data = full_data[task]["test"]
+                
+            else:
+                train_data = full_data["train"]
+                test_data = full_data["test"]
+
+            transform = transforms.Compose([
+                transforms.Resize((imagesize, imagesize)),
+                transforms.ToTensor(),
+            ])
+
+            train_dataset = JSONContinualDataset(train_data, transform=transform, name=task or "base")
+            test_dataset = JSONContinualDataset(test_data, transform=transform, name=task or "base")
 
             train_dataloader = torch.utils.data.DataLoader(
                 train_dataset,
@@ -316,39 +337,107 @@ def dataset(
                 prefetch_factor=2,
                 pin_memory=True,
             )
+            
+            train_dataloader.name = train_dataset.name
+            test_dataloader.name = test_dataset.name
+            
+            dataloaders.append({
+                "training": train_dataloader,
+                "validation": None,
+                "testing": test_dataloader,
+            })
 
-            train_dataloader.name = name
-            if subdataset is not None:
-                train_dataloader.name += "_" + subdataset
+            LOGGER.info(f"[JSON Mode] Loaded {len(train_dataset)}/{len(test_dataset)} train/test samples for training/testing.")
+            return dataloaders
+            
+        
+        else:
+            dataset_info = _DATASETS[name]
+            dataset_library = __import__(dataset_info[0], fromlist=[dataset_info[1]])
+            dataloaders = []
 
-            if train_val_split < 1:
-                val_dataset = dataset_library.__dict__[dataset_info[1]](
+            for subdataset in subdatasets:
+                train_dataset = dataset_library.__dict__[dataset_info[1]](
                     data_path,
                     classname=subdataset,
                     resize=resize,
                     train_val_split=train_val_split,
                     imagesize=imagesize,
-                    split=dataset_library.DatasetSplit.VAL,
+                    split=dataset_library.DatasetSplit.TRAIN,
                     seed=seed,
+                    rotate_degrees=rotate_degrees,
+                    translate=translate,
+                    brightness_factor=brightness,
+                    contrast_factor=contrast,
+                    saturation_factor=saturation,
+                    gray_p=gray,
+                    h_flip_p=hflip,
+                    v_flip_p=vflip,
+                    scale=scale,
+                    augment=augment,
                 )
 
-                val_dataloader = torch.utils.data.DataLoader(
-                    val_dataset,
+                test_dataset = dataset_library.__dict__[dataset_info[1]](
+                    data_path,
+                    classname=subdataset,
+                    resize=resize,
+                    imagesize=imagesize,
+                    split=dataset_library.DatasetSplit.TEST,
+                    seed=seed,
+                )
+                
+                LOGGER.info(f"Dataset: train={len(train_dataset)} test={len(test_dataset)}")
+
+                train_dataloader = torch.utils.data.DataLoader(
+                    train_dataset,
+                    batch_size=batch_size,
+                    shuffle=True,
+                    num_workers=num_workers,
+                    prefetch_factor=2,
+                    pin_memory=True,
+                )
+
+                test_dataloader = torch.utils.data.DataLoader(
+                    test_dataset,
                     batch_size=batch_size,
                     shuffle=False,
                     num_workers=num_workers,
-                    prefetch_factor=4,
+                    prefetch_factor=2,
                     pin_memory=True,
                 )
-            else:
-                val_dataloader = None
-            dataloader_dict = {
-                "training": train_dataloader,
-                "validation": val_dataloader,
-                "testing": test_dataloader,
-            }
 
-            dataloaders.append(dataloader_dict)
+                train_dataloader.name = name
+                if subdataset is not None:
+                    train_dataloader.name += "_" + subdataset
+
+                if train_val_split < 1:
+                    val_dataset = dataset_library.__dict__[dataset_info[1]](
+                        data_path,
+                        classname=subdataset,
+                        resize=resize,
+                        train_val_split=train_val_split,
+                        imagesize=imagesize,
+                        split=dataset_library.DatasetSplit.VAL,
+                        seed=seed,
+                    )
+
+                    val_dataloader = torch.utils.data.DataLoader(
+                        val_dataset,
+                        batch_size=batch_size,
+                        shuffle=False,
+                        num_workers=num_workers,
+                        prefetch_factor=4,
+                        pin_memory=True,
+                    )
+                else:
+                    val_dataloader = None
+                dataloader_dict = {
+                    "training": train_dataloader,
+                    "validation": val_dataloader,
+                    "testing": test_dataloader,
+                }
+
+                dataloaders.append(dataloader_dict)
         return dataloaders
 
     return ("get_dataloaders", get_dataloaders)
