@@ -378,13 +378,13 @@ class SimpleNet(torch.nn.Module):
                 # segmentations, masks_gt
             full_pixel_auroc = pixel_scores["auroc"]
 
-            pro = metrics.compute_pro(np.squeeze(np.array(masks_gt)), 
+            pro, pixel_ap = metrics.compute_pro(np.squeeze(np.array(masks_gt)), 
                                             norm_segmentations)
         else:
             full_pixel_auroc = -1 
             pro = -1
 
-        return auroc, full_pixel_auroc, pro
+        return auroc, full_pixel_auroc, pro, pixel_ap
         
     
     def train(self, training_data, test_data):
@@ -403,9 +403,9 @@ class SimpleNet(torch.nn.Module):
 
             self.predict(training_data, "train_")
             scores, segmentations, features, labels_gt, masks_gt = self.predict(test_data)
-            auroc, full_pixel_auroc, anomaly_pixel_auroc = self._evaluate(test_data, scores, segmentations, features, labels_gt, masks_gt)
+            auroc, full_pixel_auroc, anomaly_pixel_auroc, pixel_ap = self._evaluate(test_data, scores, segmentations, features, labels_gt, masks_gt)
             
-            return auroc, full_pixel_auroc, anomaly_pixel_auroc
+            return auroc, full_pixel_auroc, anomaly_pixel_auroc, pixel_ap
         
         def update_state_dict(d):
             
@@ -418,35 +418,39 @@ class SimpleNet(torch.nn.Module):
                     for k, v in self.pre_projection.state_dict().items()})
 
         best_record = None
-        for i_mepoch in range(self.meta_epochs):
-
+        for i_mepoch in tqdm.tqdm(range(self.meta_epochs)):
+            print("self.meta_epochs:", self.meta_epochs)
+            
             self._train_discriminator(training_data)
 
             # torch.cuda.empty_cache()
             scores, segmentations, features, labels_gt, masks_gt = self.predict(test_data)
-            auroc, full_pixel_auroc, pro = self._evaluate(test_data, scores, segmentations, features, labels_gt, masks_gt)
+            auroc, full_pixel_auroc, pro, pixel_ap = self._evaluate(test_data, scores, segmentations, features, labels_gt, masks_gt)
             self.logger.logger.add_scalar("i-auroc", auroc, i_mepoch)
             self.logger.logger.add_scalar("p-auroc", full_pixel_auroc, i_mepoch)
             self.logger.logger.add_scalar("pro", pro, i_mepoch)
+            self.logger.logger.add_scalar("pixel_ap", pixel_ap, i_mepoch)
 
             if best_record is None:
-                best_record = [auroc, full_pixel_auroc, pro]
+                best_record = [auroc, full_pixel_auroc, pro, pixel_ap]
                 update_state_dict(state_dict)
                 # state_dict = OrderedDict({k:v.detach().cpu() for k, v in self.state_dict().items()})
             else:
                 if auroc > best_record[0]:
-                    best_record = [auroc, full_pixel_auroc, pro]
+                    best_record = [auroc, full_pixel_auroc, pro, pixel_ap]
                     update_state_dict(state_dict)
                     # state_dict = OrderedDict({k:v.detach().cpu() for k, v in self.state_dict().items()})
                 elif auroc == best_record[0] and full_pixel_auroc > best_record[1]:
                     best_record[1] = full_pixel_auroc
                     best_record[2] = pro 
+                    best_record[3] = pixel_ap
                     update_state_dict(state_dict)
                     # state_dict = OrderedDict({k:v.detach().cpu() for k, v in self.state_dict().items()})
 
             print(f"----- {i_mepoch} I-AUROC:{round(auroc, 4)}(MAX:{round(best_record[0], 4)})"
                   f"  P-AUROC{round(full_pixel_auroc, 4)}(MAX:{round(best_record[1], 4)}) -----"
-                  f"  PRO-AUROC{round(pro, 4)}(MAX:{round(best_record[2], 4)}) -----")
+                  f"  PRO-AUROC{round(pro, 4)}(MAX:{round(best_record[2], 4)}) -----"
+                  f"  PixelAP{round(pixel_ap, 4)}(MAX:{round(best_record[3], 4)}) -----")
         
         torch.save(state_dict, ckpt_path)
         

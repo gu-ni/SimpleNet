@@ -2,7 +2,7 @@
 import cv2
 import numpy as np
 from sklearn import metrics
-
+from tqdm import tqdm
 
 def compute_imagewise_retrieval_metrics(
     anomaly_prediction_weights, anomaly_ground_truth_labels
@@ -86,9 +86,69 @@ def compute_pixelwise_retrieval_metrics(anomaly_segmentations, ground_truth_mask
 import pandas as pd
 from skimage import measure
 def compute_pro(masks, amaps, num_th=200):
+    """
+    Compute the Per-Region Overlap (PRO) score for pixel-level anomaly localization.
+
+    Args:
+        masks (np.ndarray): Binary ground-truth masks. Shape (N, H, W)
+        amaps (np.ndarray): Anomaly maps (float), higher values indicate more anomalous. Shape (N, H, W)
+        num_th (int): Number of threshold steps.
+
+    Returns:
+        pro_auc (float): Area under the PRO vs FPR curve.
+    """
+    records = []
+
+    min_th = amaps.min()
+    max_th = amaps.max()
+    delta = (max_th - min_th) / num_th
+
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+
+    for th in tqdm(np.arange(min_th, max_th, delta)):
+        binary_amaps = (amaps > th).astype(np.uint8)  # fresh binary map each iteration
+
+        pros = []
+        for binary_amap, mask in zip(binary_amaps, masks):
+            dilated_amap = cv2.dilate(binary_amap, kernel)
+            labeled_mask = measure.label(mask)
+            props = measure.regionprops(labeled_mask)
+            for region in props:
+                axes0_ids = region.coords[:, 0]
+                axes1_ids = region.coords[:, 1]
+                tp_pixels = dilated_amap[axes0_ids, axes1_ids].sum()
+                pros.append(tp_pixels / region.area)
+
+        inverse_masks = 1 - masks
+        fp_pixels = np.logical_and(inverse_masks, binary_amaps).sum()
+        fpr = fp_pixels / inverse_masks.sum()
+
+        records.append({"pro": np.mean(pros), "fpr": fpr, "threshold": th})
+
+    df = pd.DataFrame.from_records(records)
+
+    # Normalize FPR to 0~0.3 range
+    df = df[df["fpr"] < 0.3]
+    if not df.empty:
+        df["fpr"] = df["fpr"] / df["fpr"].max()
+        pro_auc = metrics.auc(df["fpr"], df["pro"])
+    else:
+        pro_auc = 0.0  # fallback if no valid region
+
+    y_true = masks.flatten().astype(np.uint8)
+    y_score = amaps.flatten().astype(np.float32)
+    y_score = (y_score - y_score.min()) / (y_score.max() - y_score.min() + 1e-6)
+    if np.unique(y_true).size == 1:
+        pixel_ap = 0.0  # or np.nan
+    else:
+        pixel_ap = metrics.average_precision_score(y_true, y_score)
+    
+    return pro_auc, pixel_ap
+
+"""def compute_pro(masks, amaps, num_th=200):
 
     df = pd.DataFrame([], columns=["pro", "fpr", "threshold"])
-    binary_amaps = np.zeros_like(amaps, dtype=np.bool)
+    binary_amaps = np.zeros_like(amaps, dtype=bool)
 
     min_th = amaps.min()
     max_th = amaps.max()
@@ -119,4 +179,4 @@ def compute_pro(masks, amaps, num_th=200):
     df["fpr"] = df["fpr"] / df["fpr"].max()
 
     pro_auc = metrics.auc(df["fpr"], df["pro"])
-    return pro_auc
+    return pro_auc"""

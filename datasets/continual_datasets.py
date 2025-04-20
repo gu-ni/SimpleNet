@@ -11,13 +11,13 @@ from PIL import Image
 
 class JSONContinualDataset(Dataset):
     dataset_root_map = {
-        "continual_ad": "/data/datasets/MegaInspection/megainspection/continual_ad",
-        "mvtec": "/data/datasets/MegaInspection/non_megainspection/mvtec",
-        "visa": "/data/datasets/MegaInspection/non_megainspection/visa",
-        "realiad": "/data/datasets/MegaInspection/non_megainspection/realiad",
-        "viaduct": "/data/datasets/MegaInspection/non_megainspection/viaduct",
-        "btad": "/data/datasets/MegaInspection/non_megainspection/btad",
-        "mpdd": "/data/datasets/MegaInspection/non_megainspection/mpdd"
+        "continual_ad": "/datasets/MegaInspection/megainspection",
+        "mvtec_anomaly_detection": "/datasets/MegaInspection/non_megainspection/MVTec",
+        "VisA_20220922": "/datasets/MegaInspection/non_megainspection/VisA",
+        "Real-IAD-512": "/datasets/MegaInspection/non_megainspection/Real-IAD",
+        "VIADUCT": "/datasets/MegaInspection/non_megainspection/VIADUCT",
+        "BTAD": "/datasets/MegaInspection/non_megainspection/BTAD",
+        "MPDD": "/datasets/MegaInspection/non_megainspection/MPDD"
     }
 
     def __init__(self, json_data, transform=None, name="json_dataset"):
@@ -33,11 +33,13 @@ class JSONContinualDataset(Dataset):
         self.imagesize = (3, *transform.transforms[0].size) if transform else None
 
     def resolve_path(self, relative_path):
+        if not relative_path:
+            return None
         if os.path.isabs(relative_path):
             return relative_path
         parts = relative_path.split("/", 1)
         if len(parts) != 2:
-            return relative_path
+            return None
         prefix, sub_path = parts
         root = self.dataset_root_map.get(prefix, "")
         return os.path.normpath(os.path.join(root, sub_path))
@@ -48,12 +50,18 @@ class JSONContinualDataset(Dataset):
         mask_path = item["mask_path"]
         if self.transform:
             img = self.transform(img)
-            if mask_path is not None:
+        mask = None
+        if mask_path and os.path.exists(mask_path):
+            try:
                 mask = Image.open(mask_path)
-                mask = self.transform(mask)
-            else:
-                # Create dummy mask if missing (all ones: pass-through mask)
-                mask = torch.zeros((1, *self.imagesize[1:]), dtype=torch.uint8)
+                if self.transform:
+                    mask = self.transform(mask)
+            except Exception as e:
+                print(f"[!] Failed to open mask at {mask_path}: {e}")
+                mask = torch.zeros((1, *self.imagesize[1:])).float()
+        else:
+            # Dummy mask (통과 마스크, 전부 0으로): 이상 없는 픽셀
+            mask = torch.zeros((1, *self.imagesize[1:])).float()
 
         output = {
             "image": img,

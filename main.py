@@ -9,6 +9,7 @@ import logging
 import os
 import sys
 import json
+import random
 
 import click
 import numpy as np
@@ -20,6 +21,7 @@ import common
 import metrics
 import simplenet 
 import utils
+from sklearn.model_selection import train_test_split
 
 from datasets.continual_datasets import JSONContinualDataset
 import torchvision.transforms as transforms
@@ -113,7 +115,7 @@ def run(
 
             SimpleNet.set_model_dir(os.path.join(models_dir, f"{i}"), dataset_name)
             if not test:
-                i_auroc, p_auroc, pro_auroc = SimpleNet.train(dataloaders["training"], dataloaders["testing"])
+                i_auroc, p_auroc, pro_auroc, pixel_ap = SimpleNet.train(dataloaders["training"], dataloaders["validation"])
             else:
                 # BUG: the following line is not using. Set test with True by default.
                 # i_auroc, p_auroc, pro_auroc =  SimpleNet.test(dataloaders["training"], dataloaders["testing"], save_segmentation_images)
@@ -125,6 +127,7 @@ def run(
                     "instance_auroc": i_auroc, # auroc,
                     "full_pixel_auroc": p_auroc, # full_pixel_auroc,
                     "anomaly_pixel_auroc": pro_auroc,
+                    "pixel_ap": pixel_ap,
                 }
             )
 
@@ -296,9 +299,14 @@ def dataset(
 ):
     if json_path is None and (name is None or data_path is None):
         raise ValueError("Either --json_path or both positional arguments (name, data_path) must be provided.")
-
+    
+    dataloaders = []
     def get_dataloaders(seed):
         if json_path is not None:
+            
+            def get_prefix(sample):
+                return sample["img_path"].split("/", 1)[0]
+            
             with open(json_path, 'r') as f:
                 full_data = json.load(f)
 
@@ -311,14 +319,41 @@ def dataset(
             else:
                 train_data = full_data["train"]
                 test_data = full_data["test"]
+            
+            all_train_samples = []
+            for class_samples in train_data.values():
+                all_train_samples.extend(class_samples)
+            
+            try:
+                stratify_labels = [
+                    f"{get_prefix(s)}_{s['anomaly']}" for s in all_train_samples
+                ]
+                train_samples, val_samples = train_test_split(
+                    all_train_samples,
+                    test_size=0.2,
+                    random_state=seed,
+                    stratify=stratify_labels
+                )
+            except ValueError as e:
+                LOGGER.warning(f"Stratify by prefix+anomaly failed: {e}. Falling back to anomaly-only.")
+                stratify_labels = [s['anomaly'] for s in all_train_samples]
+                train_samples, val_samples = train_test_split(
+                    all_train_samples,
+                    test_size=0.2,
+                    random_state=seed,
+                    stratify=stratify_labels
+                )
+            
 
             transform = transforms.Compose([
                 transforms.Resize((imagesize, imagesize)),
                 transforms.ToTensor(),
             ])
 
-            train_dataset = JSONContinualDataset(train_data, transform=transform, name=task or "base")
-            test_dataset = JSONContinualDataset(test_data, transform=transform, name=task or "base")
+            train_dataset = JSONContinualDataset({f"{i}": [s] for i, s in enumerate(train_samples)}, transform=transform, name=task or "base")
+            val_dataset   = JSONContinualDataset({f"{i}": [s] for i, s in enumerate(val_samples)}, transform=transform, name=task or "base")
+            test_dataset  = JSONContinualDataset(test_data, transform=transform, name=task or "base")
+
 
             train_dataloader = torch.utils.data.DataLoader(
                 train_dataset,
@@ -326,6 +361,15 @@ def dataset(
                 shuffle=True,
                 num_workers=num_workers,
                 prefetch_factor=2,
+                pin_memory=True,
+            )
+
+            val_dataloader = torch.utils.data.DataLoader(
+                val_dataset,
+                batch_size=batch_size, 
+                shuffle=False, 
+                num_workers=num_workers, 
+                prefetch_factor=2, 
                 pin_memory=True,
             )
 
@@ -343,7 +387,7 @@ def dataset(
             
             dataloaders.append({
                 "training": train_dataloader,
-                "validation": None,
+                "validation": val_dataloader,
                 "testing": test_dataloader,
             })
 
@@ -354,7 +398,6 @@ def dataset(
         else:
             dataset_info = _DATASETS[name]
             dataset_library = __import__(dataset_info[0], fromlist=[dataset_info[1]])
-            dataloaders = []
 
             for subdataset in subdatasets:
                 train_dataset = dataset_library.__dict__[dataset_info[1]](
