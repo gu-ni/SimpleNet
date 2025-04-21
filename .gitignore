@@ -1,4 +1,8 @@
 __pycache__/*
+<<<<<<< HEAD
 results/
 checkpoints/
 datasets/__pycache__
+=======
+.DS_Store
+>>>>>>> 9367ab7 (gitignore update)
