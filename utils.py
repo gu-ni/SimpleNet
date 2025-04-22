@@ -74,25 +74,6 @@ def plot_segmentation_images(
         plt.close()
 
 
-def create_storage_folder(
-    main_folder_path, project_folder, group_folder, run_name, mode="iterate"
-):
-    os.makedirs(main_folder_path, exist_ok=True)
-    project_path = os.path.join(main_folder_path, project_folder)
-    os.makedirs(project_path, exist_ok=True)
-    save_path = os.path.join(project_path, group_folder, run_name)
-    if mode == "iterate":
-        counter = 0
-        while os.path.exists(save_path):
-            save_path = os.path.join(project_path, group_folder + "_" + str(counter))
-            counter += 1
-        os.makedirs(save_path)
-    elif mode == "overwrite":
-        os.makedirs(save_path, exist_ok=True)
-
-    return save_path
-
-
 def set_torch_device(gpu_ids):
     """Returns correct torch.device.
 

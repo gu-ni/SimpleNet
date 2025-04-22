@@ -10,6 +10,7 @@ import os
 import sys
 import json
 import random
+import re
 
 import click
 import numpy as np
@@ -23,7 +24,7 @@ import simplenet
 import utils
 from sklearn.model_selection import train_test_split
 
-from datasets.continual_datasets import JSONContinualDataset
+from datasets.continual_datasets import JSONDataset
 import torchvision.transforms as transforms
 
 LOGGER = logging.getLogger(__name__)
@@ -42,8 +43,8 @@ _DATASETS = {
 @click.option("--run_name", type=str, default="test")
 @click.option("--test", is_flag=True)
 @click.option("--save_segmentation_images", is_flag=True, default=False, show_default=True)
-@click.option("--base_checkpoint", type=str, default=None, help="Path to base checkpoint to load.")
-@click.option("--save_checkpoint", type=str, default=None, help="Directory to save checkpoints after training.")
+@click.option("--json_path", type=str, default="", help="Path to class/task json file for continual learning.")
+@click.option("--task_id", type=int, default=0, help="Specify which task to load.")
 def main(**kwargs):
     pass
 
@@ -59,25 +60,39 @@ def run(
     run_name,
     test,
     save_segmentation_images,
-    base_checkpoint,
-    save_checkpoint,
+    json_path,
+    task_id,
 ):
     methods = {key: item for (key, item) in methods}
-
-    run_save_path = utils.create_storage_folder(
-        results_path, log_project, log_group, run_name, mode="overwrite"
-    )
-
+    
+    
+    if task_id == 0:
+        phase = "base"
+    else:
+        phase = "continual"
+    
+    if json_path.endswith("except_mvtec_visa"):
+        scenario = "scenario_2"
+    elif json_path.endswith("except_continual_ad"):
+        scenario = "scenario_3"
+    else:
+        scenario = "scenario_1"
+    
+    if phase == "base":
+        output_dir = f"/workspace/MegaInspection/SimpleNet/outputs/{scenario}/base"
+    elif phase == "continual":
+        num_classes_per_task = int(re.match(r'\d+', json_path).group())
+        num_classes_per_task = num_classes_per_task
+        output_dir = f"/workspace/MegaInspection/SimpleNet/outputs/{scenario}/{num_classes_per_task}classes_tasks"
+    
     pid = os.getpid()
     list_of_dataloaders = methods["get_dataloaders"](seed)
 
     device = utils.set_torch_device(gpu)
 
-    result_collect = []
     for dataloader_count, dataloaders in enumerate(list_of_dataloaders):
         LOGGER.info(
-            "Evaluating dataset [{}] ({}/{})...".format(
-                dataloaders["training"].name,
+            "Evaluating dataset ({}/{})...".format(
                 dataloader_count + 1,
                 len(list_of_dataloaders),
             )
@@ -85,97 +100,108 @@ def run(
 
         utils.fix_seeds(seed, device)
 
-        dataset_name = dataloaders["training"].name
 
         imagesize = dataloaders["training"].dataset.imagesize
         simplenet_list = methods["get_simplenet"](imagesize, device)
 
-        models_dir = os.path.join(run_save_path, "models")
-        os.makedirs(models_dir, exist_ok=True)
         for i, SimpleNet in enumerate(simplenet_list):
             
-            # Load base checkpoint if provided
-            if base_checkpoint is not None:
-                checkpoint_path = os.path.join(base_checkpoint, f"{dataset_name}_{i}.pth")
-                if os.path.exists(checkpoint_path):
-                    LOGGER.info(f"Loading checkpoint from {checkpoint_path}")
-                    SimpleNet.load_checkpoint(checkpoint_path)
+            if phase == "base":
+            
+                # # Load base checkpoint if provided
+                # if base_checkpoint is not None:
+                #     checkpoint_path = os.path.join(base_checkpoint, f"{dataset_name}_{i}.pth")
+                #     if os.path.exists(checkpoint_path):
+                #         LOGGER.info(f"Loading checkpoint from {checkpoint_path}")
+                #         SimpleNet.load_checkpoint(checkpoint_path)
+                #     else:
+                #         LOGGER.warning(f"Checkpoint path not found: {checkpoint_path}")
+
+                # torch.cuda.empty_cache()
+                if SimpleNet.backbone.seed is not None:
+                    utils.fix_seeds(SimpleNet.backbone.seed, device)
+                LOGGER.info(
+                    "Training models ({}/{})".format(i + 1, len(simplenet_list))
+                )
+                # torch.cuda.empty_cache()
+                SimpleNet.set_model_dir(output_dir)
+
+                if not test:
+                    _ = SimpleNet.train(dataloaders["training"], None)
                 else:
-                    LOGGER.warning(f"Checkpoint path not found: {checkpoint_path}")
+                    # BUG: the following line is not using. Set test with True by default.
+                    # i_auroc, p_auroc, pro_auroc =  SimpleNet.test(dataloaders["training"], dataloaders["testing"], save_segmentation_images)
+                    print("Warning: Pls set test with true by default")
 
-            
-            
-            # torch.cuda.empty_cache()
-            if SimpleNet.backbone.seed is not None:
-                utils.fix_seeds(SimpleNet.backbone.seed, device)
-            LOGGER.info(
-                "Training models ({}/{})".format(i + 1, len(simplenet_list))
-            )
-            # torch.cuda.empty_cache()
-
-            SimpleNet.set_model_dir(os.path.join(models_dir, f"{i}"), dataset_name)
-            if not test:
-                i_auroc, p_auroc, pro_auroc, pixel_ap = SimpleNet.train(dataloaders["training"], dataloaders["validation"])
-            else:
-                # BUG: the following line is not using. Set test with True by default.
-                # i_auroc, p_auroc, pro_auroc =  SimpleNet.test(dataloaders["training"], dataloaders["testing"], save_segmentation_images)
-                print("Warning: Pls set test with true by default")
-
-            result_collect.append(
-                {
-                    "dataset_name": dataset_name,
-                    "instance_auroc": i_auroc, # auroc,
-                    "full_pixel_auroc": p_auroc, # full_pixel_auroc,
-                    "anomaly_pixel_auroc": pro_auroc,
-                    "pixel_ap": pixel_ap,
-                }
-            )
-
-            # Save checkpoint if requested
-            if save_checkpoint is not None:
-                save_path = os.path.join(save_checkpoint, f"{dataset_name}_{i}.pth")
+                # Save checkpoint
+                save_path = os.path.join(output_dir, "base.pth")
                 os.makedirs(os.path.dirname(save_path), exist_ok=True)
                 SimpleNet.save(save_path)
-                LOGGER.info(f"Saved checkpoint to {save_path}")
+                LOGGER.info(f"[BASE] Traning end. Saved checkpoint to {save_path}")
+            
+            elif phase == "continual":
+                
+                pretrained_path = (
+                    f"/workspace/MegaInspection/SimpleNet/outputs/{scenario}/base/base.pth" if task_id == 1
+                    else os.path.join(output_dir, f"task{task_id - 1}.pth")
+                )
+                SimpleNet.load_checkpoint(pretrained_path)
+                
+                if SimpleNet.backbone.seed is not None:
+                    utils.fix_seeds(SimpleNet.backbone.seed, device)
+                LOGGER.info(
+                    "Training models ({}/{})".format(i + 1, len(simplenet_list))
+                )
+                
+                SimpleNet.set_model_dir(output_dir)
 
+                if not test:
+                    _ = SimpleNet.train(dataloaders["training"], None)
+                else:
+                    # BUG: the following line is not using. Set test with True by default.
+                    # i_auroc, p_auroc, pro_auroc =  SimpleNet.test(dataloaders["training"], dataloaders["testing"], save_segmentation_images)
+                    print("Warning: Pls set test with true by default")
+                
+                # Save checkpoint
+                save_path = os.path.join(output_dir, f"task{task_id}.pth")
+                os.makedirs(output_dir, exist_ok=True)
+                SimpleNet.save(save_path)
+                LOGGER.info(f"[CONTINUAL] Traning end. Saved checkpoint to {save_path}")
 
-            for key, item in result_collect[-1].items():
-                if key != "dataset_name":
-                    LOGGER.info("{0}: {1:3.3f}".format(key, item))
 
         LOGGER.info("\n\n-----\n")
 
-    # Store all results and mean scores to a csv-file.
-    result_metric_names = list(result_collect[-1].keys())[1:]
-    result_dataset_names = [results["dataset_name"] for results in result_collect]
-    result_scores = [list(results.values())[1:] for results in result_collect]
-    utils.compute_and_store_final_results(
-        run_save_path,
-        result_scores,
-        column_names=result_metric_names,
-        row_names=result_dataset_names,
-    )
+    # # Store all results and mean scores to a csv-file.
+    # result_metric_names = list(result_collect[-1].keys())[1:]
+    # result_dataset_names = [results["dataset_name"] for results in result_collect]
+    # result_scores = [list(results.values())[1:] for results in result_collect]
+    # utils.compute_and_store_final_results(
+    #     run_save_path,
+    #     result_scores,
+    #     column_names=result_metric_names,
+    #     row_names=result_dataset_names,
+    # )
 
 
 @main.command("net")
-@click.option("--backbone_names", "-b", type=str, multiple=True, default=[])
-@click.option("--layers_to_extract_from", "-le", type=str, multiple=True, default=[])
-@click.option("--pretrain_embed_dimension", type=int, default=1024)
-@click.option("--target_embed_dimension", type=int, default=1024)
+@click.option("--backbone_names", "-b", type=str, multiple=True, default=["wideresnet50"])
+@click.option("--layers_to_extract_from", "-le", type=str, multiple=True, default=["layer2", "layer3"])
+@click.option("--pretrain_embed_dimension", type=int, default=1536)
+@click.option("--target_embed_dimension", type=int, default=1536)
 @click.option("--patchsize", type=int, default=3)
-@click.option("--embedding_size", type=int, default=1024)
+@click.option("--embedding_size", type=int, default=256)
 @click.option("--meta_epochs", type=int, default=1)
 @click.option("--aed_meta_epochs", type=int, default=1)
 @click.option("--gan_epochs", type=int, default=1)
 @click.option("--dsc_layers", type=int, default=2)
-@click.option("--dsc_hidden", type=int, default=None)
-@click.option("--noise_std", type=float, default=0.05)
-@click.option("--dsc_margin", type=float, default=0.8)
+@click.option("--dsc_hidden", type=int, default=1024)
+@click.option("--noise_std", type=float, default=0.015)
+@click.option("--dsc_margin", type=float, default=0.5)
 @click.option("--dsc_lr", type=float, default=0.0002)
 @click.option("--auto_noise", type=float, default=0)
 @click.option("--train_backbone", is_flag=True)
 @click.option("--cos_lr", is_flag=True)
-@click.option("--pre_proj", type=int, default=0)
+@click.option("--pre_proj", type=int, default=1)
 @click.option("--proj_layer_type", type=int, default=0)
 @click.option("--mix_noise", type=int, default=1)
 def net(
@@ -200,7 +226,7 @@ def net(
     proj_layer_type,
     mix_noise,
 ):
-    backbone_names = list(backbone_names)
+    backbone_names = list(backbone_names) if not isinstance(backbone_names, list) else backbone_names
     if len(backbone_names) > 1:
         layers_to_extract_from_coll = [[] for _ in range(len(backbone_names))]
         for layer in layers_to_extract_from:
@@ -261,8 +287,8 @@ def net(
 @click.option("--train_val_split", type=float, default=1, show_default=True)
 @click.option("--batch_size", default=2, type=int, show_default=True)
 @click.option("--num_workers", default=2, type=int, show_default=True)
-@click.option("--resize", default=256, type=int, show_default=True)
-@click.option("--imagesize", default=224, type=int, show_default=True)
+@click.option("--resize", default=336, type=int, show_default=True)
+@click.option("--imagesize", default=336, type=int, show_default=True)
 @click.option("--rotate_degrees", default=0, type=int)
 @click.option("--translate", default=0, type=float)
 @click.option("--scale", default=0.0, type=float)
@@ -273,8 +299,8 @@ def net(
 @click.option("--hflip", default=0.0, type=float)
 @click.option("--vflip", default=0.0, type=float)
 @click.option("--augment", is_flag=True)
-@click.option("--json_path", type=str, default=None, help="Path to class/task json file for continual learning.")
-@click.option("--task", type=str, default=None, help="Specify which task to load.")
+@click.option("--json_path", type=str, default="", help="Path to class/task json file for continual learning.")
+@click.option("--task_id", type=int, default=0, help="Specify which task to load.")
 def dataset(
     name,
     data_path,
@@ -295,194 +321,51 @@ def dataset(
     vflip,
     augment,
     json_path,
-    task,
+    task_id,
 ):
     if json_path is None and (name is None or data_path is None):
         raise ValueError("Either --json_path or both positional arguments (name, data_path) must be provided.")
     
     dataloaders = []
     def get_dataloaders(seed):
-        if json_path is not None:
-            
-            def get_prefix(sample):
-                return sample["img_path"].split("/", 1)[0]
-            
-            with open(json_path, 'r') as f:
-                full_data = json.load(f)
-
-            if task is not None:
-                if task not in full_data:
-                    raise ValueError(f"Task '{task}' not found in {json_path}")
-                train_data = full_data[task]["train"]
-                test_data = full_data[task]["test"]
-                
-            else:
-                train_data = full_data["train"]
-                test_data = full_data["test"]
-            
-            all_train_samples = []
-            for class_samples in train_data.values():
-                all_train_samples.extend(class_samples)
-            
-            try:
-                stratify_labels = [
-                    f"{get_prefix(s)}_{s['anomaly']}" for s in all_train_samples
-                ]
-                train_samples, val_samples = train_test_split(
-                    all_train_samples,
-                    test_size=0.2,
-                    random_state=seed,
-                    stratify=stratify_labels
-                )
-            except ValueError as e:
-                LOGGER.warning(f"Stratify by prefix+anomaly failed: {e}. Falling back to anomaly-only.")
-                stratify_labels = [s['anomaly'] for s in all_train_samples]
-                train_samples, val_samples = train_test_split(
-                    all_train_samples,
-                    test_size=0.2,
-                    random_state=seed,
-                    stratify=stratify_labels
-                )
-            
-
-            transform = transforms.Compose([
-                transforms.Resize((imagesize, imagesize)),
-                transforms.ToTensor(),
-            ])
-
-            train_dataset = JSONContinualDataset({f"{i}": [s] for i, s in enumerate(train_samples)}, transform=transform, name=task or "base")
-            val_dataset   = JSONContinualDataset({f"{i}": [s] for i, s in enumerate(val_samples)}, transform=transform, name=task or "base")
-            test_dataset  = JSONContinualDataset(test_data, transform=transform, name=task or "base")
-
-
-            train_dataloader = torch.utils.data.DataLoader(
-                train_dataset,
-                batch_size=batch_size,
-                shuffle=True,
-                num_workers=num_workers,
-                prefetch_factor=2,
-                pin_memory=True,
-            )
-
-            val_dataloader = torch.utils.data.DataLoader(
-                val_dataset,
-                batch_size=batch_size, 
-                shuffle=False, 
-                num_workers=num_workers, 
-                prefetch_factor=2, 
-                pin_memory=True,
-            )
-
-            test_dataloader = torch.utils.data.DataLoader(
-                test_dataset,
-                batch_size=batch_size,
-                shuffle=False,
-                num_workers=num_workers,
-                prefetch_factor=2,
-                pin_memory=True,
-            )
-            
-            train_dataloader.name = train_dataset.name
-            test_dataloader.name = test_dataset.name
-            
-            dataloaders.append({
-                "training": train_dataloader,
-                "validation": val_dataloader,
-                "testing": test_dataloader,
-            })
-
-            LOGGER.info(f"[JSON Mode] Loaded {len(train_dataset)}/{len(test_dataset)} train/test samples for training/testing.")
-            return dataloaders
-            
         
+        json_path_ = os.path.join("/workspace/meta_files", f"{json_path}.json")
+        
+        with open(json_path_, 'r') as f:
+            full_data = json.load(f)
+
+        if task_id == 0:
+            train_data = full_data["train"]
         else:
-            dataset_info = _DATASETS[name]
-            dataset_library = __import__(dataset_info[0], fromlist=[dataset_info[1]])
+            task_key = f"task_{task_id}"
+            train_data = full_data[task_key]["train"]
+            
 
-            for subdataset in subdatasets:
-                train_dataset = dataset_library.__dict__[dataset_info[1]](
-                    data_path,
-                    classname=subdataset,
-                    resize=resize,
-                    train_val_split=train_val_split,
-                    imagesize=imagesize,
-                    split=dataset_library.DatasetSplit.TRAIN,
-                    seed=seed,
-                    rotate_degrees=rotate_degrees,
-                    translate=translate,
-                    brightness_factor=brightness,
-                    contrast_factor=contrast,
-                    saturation_factor=saturation,
-                    gray_p=gray,
-                    h_flip_p=hflip,
-                    v_flip_p=vflip,
-                    scale=scale,
-                    augment=augment,
-                )
+        transform = transforms.Compose([
+            transforms.Resize((imagesize, imagesize)),
+            transforms.ToTensor(),
+        ])
 
-                test_dataset = dataset_library.__dict__[dataset_info[1]](
-                    data_path,
-                    classname=subdataset,
-                    resize=resize,
-                    imagesize=imagesize,
-                    split=dataset_library.DatasetSplit.TEST,
-                    seed=seed,
-                )
-                
-                LOGGER.info(f"Dataset: train={len(train_dataset)} test={len(test_dataset)}")
+        train_dataset = JSONDataset(train_data, transform=transform, train=True)
 
-                train_dataloader = torch.utils.data.DataLoader(
-                    train_dataset,
-                    batch_size=batch_size,
-                    shuffle=True,
-                    num_workers=num_workers,
-                    prefetch_factor=2,
-                    pin_memory=True,
-                )
+        train_dataloader = torch.utils.data.DataLoader(
+            train_dataset,
+            batch_size=batch_size,
+            shuffle=True,
+            num_workers=num_workers,
+            prefetch_factor=2,
+            pin_memory=True,
+        )
+        
+        dataloaders.append({
+            "training": train_dataloader,
+            "validation": None,
+            "testing": None,
+        })
 
-                test_dataloader = torch.utils.data.DataLoader(
-                    test_dataset,
-                    batch_size=batch_size,
-                    shuffle=False,
-                    num_workers=num_workers,
-                    prefetch_factor=2,
-                    pin_memory=True,
-                )
-
-                train_dataloader.name = name
-                if subdataset is not None:
-                    train_dataloader.name += "_" + subdataset
-
-                if train_val_split < 1:
-                    val_dataset = dataset_library.__dict__[dataset_info[1]](
-                        data_path,
-                        classname=subdataset,
-                        resize=resize,
-                        train_val_split=train_val_split,
-                        imagesize=imagesize,
-                        split=dataset_library.DatasetSplit.VAL,
-                        seed=seed,
-                    )
-
-                    val_dataloader = torch.utils.data.DataLoader(
-                        val_dataset,
-                        batch_size=batch_size,
-                        shuffle=False,
-                        num_workers=num_workers,
-                        prefetch_factor=4,
-                        pin_memory=True,
-                    )
-                else:
-                    val_dataloader = None
-                dataloader_dict = {
-                    "training": train_dataloader,
-                    "validation": val_dataloader,
-                    "testing": test_dataloader,
-                }
-
-                dataloaders.append(dataloader_dict)
+        LOGGER.info(f"[JSON Mode] Loaded {len(train_dataset)} train samples.")
         return dataloaders
-
+        
     return ("get_dataloaders", get_dataloaders)
 
 

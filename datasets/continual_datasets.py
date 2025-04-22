@@ -9,7 +9,7 @@ import os
 from torch.utils.data import Dataset
 from PIL import Image
 
-class JSONContinualDataset(Dataset):
+class JSONDataset(Dataset):
     dataset_root_map = {
         "continual_ad": "/datasets/MegaInspection/megainspection",
         "mvtec_anomaly_detection": "/datasets/MegaInspection/non_megainspection/MVTec",
@@ -19,18 +19,6 @@ class JSONContinualDataset(Dataset):
         "BTAD": "/datasets/MegaInspection/non_megainspection/BTAD",
         "MPDD": "/datasets/MegaInspection/non_megainspection/MPDD"
     }
-
-    def __init__(self, json_data, transform=None, name="json_dataset"):
-        self.samples = []
-        self.name = name
-        for class_data in json_data.values():
-            for sample in class_data:
-                sample["img_path"] = self.resolve_path(sample["img_path"])
-                if sample["mask_path"]:
-                    sample["mask_path"] = self.resolve_path(sample["mask_path"])
-                self.samples.append(sample)
-        self.transform = transform
-        self.imagesize = (3, *transform.transforms[0].size) if transform else None
 
     def resolve_path(self, relative_path):
         if not relative_path:
@@ -43,15 +31,32 @@ class JSONContinualDataset(Dataset):
         prefix, sub_path = parts
         root = self.dataset_root_map.get(prefix, "")
         return os.path.normpath(os.path.join(root, sub_path))
+    
+    def __init__(self, json_data, transform=None, train=True):
+        self.samples = []
+        for class_data in json_data.values():
+            for sample in class_data:
+                sample["img_path"] = self.resolve_path(sample["img_path"])
+                anomaly = sample.get("anomaly", 0)
+                
+                if train:
+                    if anomaly != 0:
+                        continue
+                else:
+                    sample["mask_path"] = self.resolve_path(sample["mask_path"]) if sample.get("mask_path") else ""
+
+                self.samples.append(sample)
+        self.transform = transform
+        self.imagesize = (3, *transform.transforms[0].size) if transform else None
 
     def __getitem__(self, index):
         item = self.samples[index]
         img = Image.open(item["img_path"]).convert("RGB")
-        mask_path = item["mask_path"]
+        mask_path = item.get("mask_path", "")
         if self.transform:
             img = self.transform(img)
         mask = None
-        if mask_path and os.path.exists(mask_path):
+        if mask_path and mask_path != "" and os.path.exists(mask_path):
             try:
                 mask = Image.open(mask_path)
                 if self.transform:

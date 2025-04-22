@@ -203,13 +203,13 @@ class SimpleNet(torch.nn.Module):
         self.tau = 1
         self.logger = None
 
-    def set_model_dir(self, model_dir, dataset_name):
+    def set_model_dir(self, output_dir):
 
-        self.model_dir = model_dir 
-        os.makedirs(self.model_dir, exist_ok=True)
-        self.ckpt_dir = os.path.join(self.model_dir, dataset_name)
-        os.makedirs(self.ckpt_dir, exist_ok=True)
-        self.tb_dir = os.path.join(self.ckpt_dir, "tb")
+        # self.output_dir = output_dir 
+        # os.makedirs(self.output_dir, exist_ok=True)
+        # self.ckpt_dir = os.path.join(self.model_dir, dataset_name)
+        # os.makedirs(self.ckpt_dir, exist_ok=True)
+        self.tb_dir = os.path.join(output_dir, "tb")
         os.makedirs(self.tb_dir, exist_ok=True)
         self.logger = TBWrapper(self.tb_dir) #SummaryWriter(log_dir=tb_dir)
     
@@ -390,71 +390,71 @@ class SimpleNet(torch.nn.Module):
     def train(self, training_data, test_data):
 
         
-        state_dict = {}
-        ckpt_path = os.path.join(self.ckpt_dir, "ckpt.pth")
-        if os.path.exists(ckpt_path):
-            state_dict = torch.load(ckpt_path, map_location=self.device)
-            if 'discriminator' in state_dict:
-                self.discriminator.load_state_dict(state_dict['discriminator'])
-                if "pre_projection" in state_dict:
-                    self.pre_projection.load_state_dict(state_dict["pre_projection"])
-            else:
-                self.load_state_dict(state_dict, strict=False)
+        # state_dict = {}
+        # ckpt_path = os.path.join(self.ckpt_dir, "ckpt.pth")
+        # if os.path.exists(ckpt_path):
+        #     state_dict = torch.load(ckpt_path, map_location=self.device)
+        #     if 'discriminator' in state_dict:
+        #         self.discriminator.load_state_dict(state_dict['discriminator'])
+        #         if "pre_projection" in state_dict:
+        #             self.pre_projection.load_state_dict(state_dict["pre_projection"])
+        #     else:
+        #         self.load_state_dict(state_dict, strict=False)
 
-            self.predict(training_data, "train_")
-            scores, segmentations, features, labels_gt, masks_gt = self.predict(test_data)
-            auroc, full_pixel_auroc, anomaly_pixel_auroc, pixel_ap = self._evaluate(test_data, scores, segmentations, features, labels_gt, masks_gt)
+        #     self.predict(training_data, "train_")
+        #     scores, segmentations, features, labels_gt, masks_gt = self.predict(test_data)
+        #     auroc, full_pixel_auroc, anomaly_pixel_auroc, pixel_ap = self._evaluate(test_data, scores, segmentations, features, labels_gt, masks_gt)
             
-            return auroc, full_pixel_auroc, anomaly_pixel_auroc, pixel_ap
+        #     return auroc, full_pixel_auroc, anomaly_pixel_auroc, pixel_ap
         
-        def update_state_dict(d):
+        # def update_state_dict(d):
             
-            state_dict["discriminator"] = OrderedDict({
-                k:v.detach().cpu() 
-                for k, v in self.discriminator.state_dict().items()})
-            if self.pre_proj > 0:
-                state_dict["pre_projection"] = OrderedDict({
-                    k:v.detach().cpu() 
-                    for k, v in self.pre_projection.state_dict().items()})
+        #     state_dict["discriminator"] = OrderedDict({
+        #         k:v.detach().cpu() 
+        #         for k, v in self.discriminator.state_dict().items()})
+        #     if self.pre_proj > 0:
+        #         state_dict["pre_projection"] = OrderedDict({
+        #             k:v.detach().cpu() 
+        #             for k, v in self.pre_projection.state_dict().items()})
 
-        best_record = None
+        # best_record = None
         for i_mepoch in tqdm.tqdm(range(self.meta_epochs)):
             print("self.meta_epochs:", self.meta_epochs)
             
             self._train_discriminator(training_data)
 
             # torch.cuda.empty_cache()
-            scores, segmentations, features, labels_gt, masks_gt = self.predict(test_data)
-            auroc, full_pixel_auroc, pro, pixel_ap = self._evaluate(test_data, scores, segmentations, features, labels_gt, masks_gt)
-            self.logger.logger.add_scalar("i-auroc", auroc, i_mepoch)
-            self.logger.logger.add_scalar("p-auroc", full_pixel_auroc, i_mepoch)
-            self.logger.logger.add_scalar("pro", pro, i_mepoch)
-            self.logger.logger.add_scalar("pixel_ap", pixel_ap, i_mepoch)
+            # scores, segmentations, features, labels_gt, masks_gt = self.predict(test_data)
+            # auroc, full_pixel_auroc, pro, pixel_ap = self._evaluate(test_data, scores, segmentations, features, labels_gt, masks_gt)
+            # self.logger.logger.add_scalar("i-auroc", auroc, i_mepoch)
+            # self.logger.logger.add_scalar("p-auroc", full_pixel_auroc, i_mepoch)
+            # self.logger.logger.add_scalar("pro", pro, i_mepoch)
+            # self.logger.logger.add_scalar("pixel_ap", pixel_ap, i_mepoch)
 
-            if best_record is None:
-                best_record = [auroc, full_pixel_auroc, pro, pixel_ap]
-                update_state_dict(state_dict)
-                # state_dict = OrderedDict({k:v.detach().cpu() for k, v in self.state_dict().items()})
-            else:
-                if auroc > best_record[0]:
-                    best_record = [auroc, full_pixel_auroc, pro, pixel_ap]
-                    update_state_dict(state_dict)
-                    # state_dict = OrderedDict({k:v.detach().cpu() for k, v in self.state_dict().items()})
-                elif auroc == best_record[0] and full_pixel_auroc > best_record[1]:
-                    best_record[1] = full_pixel_auroc
-                    best_record[2] = pro 
-                    best_record[3] = pixel_ap
-                    update_state_dict(state_dict)
-                    # state_dict = OrderedDict({k:v.detach().cpu() for k, v in self.state_dict().items()})
+            # if best_record is None:
+            #     best_record = [auroc, full_pixel_auroc, pro, pixel_ap]
+            #     update_state_dict(state_dict)
+            #     # state_dict = OrderedDict({k:v.detach().cpu() for k, v in self.state_dict().items()})
+            # else:
+            #     if auroc > best_record[0]:
+            #         best_record = [auroc, full_pixel_auroc, pro, pixel_ap]
+            #         update_state_dict(state_dict)
+            #         # state_dict = OrderedDict({k:v.detach().cpu() for k, v in self.state_dict().items()})
+            #     elif auroc == best_record[0] and full_pixel_auroc > best_record[1]:
+            #         best_record[1] = full_pixel_auroc
+            #         best_record[2] = pro 
+            #         best_record[3] = pixel_ap
+            #         update_state_dict(state_dict)
+            #         # state_dict = OrderedDict({k:v.detach().cpu() for k, v in self.state_dict().items()})
 
-            print(f"----- {i_mepoch} I-AUROC:{round(auroc, 4)}(MAX:{round(best_record[0], 4)})"
-                  f"  P-AUROC{round(full_pixel_auroc, 4)}(MAX:{round(best_record[1], 4)}) -----"
-                  f"  PRO-AUROC{round(pro, 4)}(MAX:{round(best_record[2], 4)}) -----"
-                  f"  PixelAP{round(pixel_ap, 4)}(MAX:{round(best_record[3], 4)}) -----")
+            # print(f"----- {i_mepoch} I-AUROC:{round(auroc, 4)}(MAX:{round(best_record[0], 4)})"
+            #       f"  P-AUROC{round(full_pixel_auroc, 4)}(MAX:{round(best_record[1], 4)}) -----"
+            #       f"  PRO-AUROC{round(pro, 4)}(MAX:{round(best_record[2], 4)}) -----"
+            #       f"  PixelAP{round(pixel_ap, 4)}(MAX:{round(best_record[3], 4)}) -----")
         
-        torch.save(state_dict, ckpt_path)
+        # torch.save(state_dict, ckpt_path)
         
-        return best_record
+        return None
             
 
     def _train_discriminator(self, input_data):
