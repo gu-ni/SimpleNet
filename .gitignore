@@ -3,3 +3,4 @@ results/
 checkpoints/
 datasets/__pycache__
 outputs/
+.DS_Store
