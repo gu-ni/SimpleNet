@@ -1,0 +1,32 @@
+{
+    "viaduct_29 threaded fitting": {
+        "image_auroc": 0.5220430107526882,
+        "pixel_ap": 0.00457656197155369,
+        "normal_count": 90,
+        "anomaly_count": 62
+    },
+    "continual_ad_Candy": {
+        "image_auroc": 0.5068329846445347,
+        "pixel_ap": 0.018144834017551396,
+        "normal_count": 517,
+        "anomaly_count": 490
+    },
+    "continual_ad_Calculator": {
+        "image_auroc": 0.44425296442687745,
+        "pixel_ap": 0.0037047367303417768,
+        "normal_count": 506,
+        "anomaly_count": 500
+    },
+    "viaduct_31 valve handle red": {
+        "image_auroc": 0.525,
+        "pixel_ap": 0.0010734372663861512,
+        "normal_count": 45,
+        "anomaly_count": 16
+    },
+    "continual_ad_Glasses-case": {
+        "image_auroc": 0.5546175408745351,
+        "pixel_ap": 0.004857522825556084,
+        "normal_count": 501,
+        "anomaly_count": 549
+    }
+}

@@ -1,0 +1,44 @@
+{
+    "viaduct_13 socket housing": {
+        "image_auroc": 0.4485207100591716,
+        "pixel_ap": 0.010902960498079435,
+        "normal_count": 65,
+        "anomaly_count": 52
+    },
+    "viaduct_47 mains tester": {
+        "image_auroc": 0.415,
+        "pixel_ap": 2.630002485541338e-05,
+        "normal_count": 50,
+        "anomaly_count": 20
+    },
+    "continual_ad_Band-aid": {
+        "image_auroc": 0.7813041797362306,
+        "pixel_ap": 0.0045796182372431354,
+        "normal_count": 511,
+        "anomaly_count": 491
+    },
+    "viaduct_48 saw blade": {
+        "image_auroc": 0.45899999999999996,
+        "pixel_ap": 0.0002537362085337537,
+        "normal_count": 50,
+        "anomaly_count": 20
+    },
+    "viaduct_30 valve handle blue": {
+        "image_auroc": 0.5614285714285714,
+        "pixel_ap": 0.0005768031045025911,
+        "normal_count": 50,
+        "anomaly_count": 14
+    },
+    "continual_ad_Watermelon": {
+        "image_auroc": 0.5625034793742694,
+        "pixel_ap": 0.038389759225246824,
+        "normal_count": 497,
+        "anomaly_count": 506
+    },
+    "continual_ad_Fork": {
+        "image_auroc": 0.5043139069782817,
+        "pixel_ap": 0.0055571096648366555,
+        "normal_count": 537,
+        "anomaly_count": 507
+    }
+}

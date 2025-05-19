@@ -1,0 +1,32 @@
+{
+    "continual_ad_Band-aid": {
+        "image_auroc": 0.8376251987835839,
+        "pixel_ap": 0.005245628117261995,
+        "normal_count": 511,
+        "anomaly_count": 491
+    },
+    "viaduct_45 damper large": {
+        "image_auroc": 0.6765384615384616,
+        "pixel_ap": 0.07131527063155649,
+        "normal_count": 65,
+        "anomaly_count": 40
+    },
+    "viaduct_48 saw blade": {
+        "image_auroc": 0.5149999999999999,
+        "pixel_ap": 0.0004121344076177527,
+        "normal_count": 50,
+        "anomaly_count": 20
+    },
+    "viaduct_05 cable end sleeve": {
+        "image_auroc": 0.3730952380952381,
+        "pixel_ap": 0.004435532085944741,
+        "normal_count": 210,
+        "anomaly_count": 40
+    },
+    "mpdd_tubes": {
+        "image_auroc": 0.4465042372881356,
+        "pixel_ap": 0.02537681178589148,
+        "normal_count": 32,
+        "anomaly_count": 59
+    }
+}

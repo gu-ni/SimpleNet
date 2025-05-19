@@ -1,0 +1,20 @@
+{
+    "continual_ad_Mouse": {
+        "image_auroc": 0.8290799679581111,
+        "pixel_ap": 0.19770947363823466,
+        "normal_count": 517,
+        "anomaly_count": 495
+    },
+    "viaduct_22 device box": {
+        "image_auroc": 0.49722222222222223,
+        "pixel_ap": 0.0001557653437135531,
+        "normal_count": 50,
+        "anomaly_count": 36
+    },
+    "viaduct_13 socket housing": {
+        "image_auroc": 0.5242603550295857,
+        "pixel_ap": 0.017103673028555477,
+        "normal_count": 65,
+        "anomaly_count": 52
+    }
+}

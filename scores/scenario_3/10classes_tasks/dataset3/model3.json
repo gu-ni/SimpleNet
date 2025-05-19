@@ -1,0 +1,32 @@
+{
+    "viaduct_11 ring cable lug": {
+        "image_auroc": 0.5677295918367347,
+        "pixel_ap": 0.0414647056344474,
+        "normal_count": 140,
+        "anomaly_count": 56
+    },
+    "viaduct_17 cherry": {
+        "image_auroc": 0.6552597402597403,
+        "pixel_ap": 0.017692356978566085,
+        "normal_count": 275,
+        "anomaly_count": 112
+    },
+    "viaduct_47 mains tester": {
+        "image_auroc": 0.56,
+        "pixel_ap": 3.798169378726042e-05,
+        "normal_count": 50,
+        "anomaly_count": 20
+    },
+    "viaduct_35 pink tablet": {
+        "image_auroc": 0.8466666666666667,
+        "pixel_ap": 0.32561869345854494,
+        "normal_count": 50,
+        "anomaly_count": 60
+    },
+    "viaduct_20 tea bag": {
+        "image_auroc": 0.5915873015873016,
+        "pixel_ap": 0.01262105361060054,
+        "normal_count": 140,
+        "anomaly_count": 90
+    }
+}

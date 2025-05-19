@@ -1,0 +1,8 @@
+{
+    "viaduct_16 vibration sensor": {
+        "image_auroc": 0.514,
+        "pixel_ap": 0.0022922224831453974,
+        "normal_count": 50,
+        "anomaly_count": 20
+    }
+}

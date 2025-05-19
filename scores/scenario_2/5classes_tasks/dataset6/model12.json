@@ -1,0 +1,8 @@
+{
+    "viaduct_43 paperclip": {
+        "image_auroc": 0.4871572871572872,
+        "pixel_ap": 0.03854193996487508,
+        "normal_count": 110,
+        "anomaly_count": 63
+    }
+}

@@ -23,6 +23,8 @@ import common
 import metrics
 from utils import plot_segmentation_images
 
+from sklearn.metrics import roc_auc_score, average_precision_score
+
 LOGGER = logging.getLogger(__name__)
 
 def init_weight(m):
@@ -342,6 +344,71 @@ class SimpleNet(torch.nn.Module):
 
         return auroc, full_pixel_auroc
     
+    def test_custom(self, test_data):
+        # ckpt_path = os.path.join(self.ckpt_dir, "models.ckpt")
+        # if os.path.exists(ckpt_path):
+        #     state_dicts = torch.load(ckpt_path, map_location=self.device)
+        #     if "pretrained_enc" in state_dicts:
+        #         self.feature_enc.load_state_dict(state_dicts["pretrained_enc"])
+        #     if "pretrained_dec" in state_dicts:
+        #         self.feature_dec.load_state_dict(state_dicts["pretrained_dec"])
+
+        aggregator = {"scores": [], "segmentations": [], "features": []}
+
+        # 1. Predict 전체 데이터
+        scores, segmentations, _, labels_gt, masks_gt, normal_count, anomaly_count = self.predict(test_data)
+        aggregator["scores"].append(scores)
+        aggregator["segmentations"].append(segmentations)
+        # aggregator["features"].append(features)
+
+        # 2. Score 정규화
+        scores = np.array(aggregator["scores"])
+        min_scores = scores.min(axis=-1).reshape(-1, 1)
+        max_scores = scores.max(axis=-1).reshape(-1, 1)
+        scores = (scores - min_scores) / (max_scores - min_scores)
+        scores = np.mean(scores, axis=0)
+
+        # 3. Segmentation 정규화
+        segmentations = np.array(aggregator["segmentations"])
+        min_scores = segmentations.reshape(len(segmentations), -1).min(axis=-1).reshape(-1, 1, 1, 1)
+        max_scores = segmentations.reshape(len(segmentations), -1).max(axis=-1).reshape(-1, 1, 1, 1)
+        segmentations_norm = np.zeros_like(segmentations)
+        for seg, min_s, max_s in zip(segmentations, min_scores, max_scores):
+            seg_norm = (seg - min_s) / np.maximum(max_s - min_s, 1e-6)
+            segmentations_norm += seg_norm
+        segmentations_norm = segmentations_norm / len(segmentations)
+
+        # # 4. anomaly label 준비
+        # anomaly_labels = [
+        #     x[1] != "good" for x in test_data.dataset.data_to_iterate
+        # ]
+
+        # # 5. segmentation 저장 (선택)
+        # if save_segmentation_images:
+        #     self.save_segmentation_images(test_data, segmentations_norm, scores)
+
+        # 6. image AUROC 계산
+        image_metrics = metrics.compute_imagewise_retrieval_metrics_custom(
+            scores, labels_gt
+        )
+        image_auroc = image_metrics["auroc"]
+
+        # 7. pixel-level AP 계산
+        pixel_metrics = metrics.compute_pixelwise_retrieval_metrics_custom(
+            segmentations_norm, masks_gt
+        )
+        pixel_ap = pixel_metrics["ap"]
+
+        return {
+            "image_auroc": image_auroc,
+            "pixel_ap": pixel_ap,
+            "normal_count": normal_count,
+            "anomaly_count": anomaly_count
+        }
+    
+    
+    
+    
     def _evaluate(self, test_data, scores, segmentations, features, labels_gt, masks_gt):
         
         scores = np.squeeze(np.array(scores))
@@ -378,13 +445,13 @@ class SimpleNet(torch.nn.Module):
                 # segmentations, masks_gt
             full_pixel_auroc = pixel_scores["auroc"]
 
-            pro, pixel_ap = metrics.compute_pro(np.squeeze(np.array(masks_gt)), 
+            pro = metrics.compute_pro(np.squeeze(np.array(masks_gt)), 
                                             norm_segmentations)
         else:
             full_pixel_auroc = -1 
             pro = -1
 
-        return auroc, full_pixel_auroc, pro, pixel_ap
+        return auroc, full_pixel_auroc, pro
         
     
     def train(self, training_data, test_data):
@@ -561,7 +628,8 @@ class SimpleNet(torch.nn.Module):
         features = []
         labels_gt = []
         masks_gt = []
-        from sklearn.manifold import TSNE
+        normal_count = 0
+        anomaly_count = 0
 
         with tqdm.tqdm(dataloader, desc="Inferring...", leave=False) as data_iterator:
             for data in data_iterator:
@@ -575,8 +643,12 @@ class SimpleNet(torch.nn.Module):
                 for score, mask, feat, is_anomaly in zip(_scores, _masks, _feats, data["is_anomaly"].numpy().tolist()):
                     scores.append(score)
                     masks.append(mask)
+                    if is_anomaly == 0:
+                        normal_count += 1
+                    elif is_anomaly == 1:
+                        anomaly_count += 1
 
-        return scores, masks, features, labels_gt, masks_gt
+        return scores, masks, features, labels_gt, masks_gt, normal_count, anomaly_count
 
     def _predict(self, images):
         """Infer score and mask for a batch of images."""

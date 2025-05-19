@@ -1,0 +1,20 @@
+{
+    "mvtec_cable": {
+        "image_auroc": 0.7176198486122792,
+        "pixel_ap": 0.17357934568547265,
+        "normal_count": 58,
+        "anomaly_count": 82
+    },
+    "visa_fryum": {
+        "image_auroc": 0.8115555555555555,
+        "pixel_ap": 0.0,
+        "normal_count": 50,
+        "anomaly_count": 90
+    },
+    "viaduct_27 L-fitting": {
+        "image_auroc": 0.48375,
+        "pixel_ap": 0.005620990345776588,
+        "normal_count": 50,
+        "anomaly_count": 16
+    }
+}

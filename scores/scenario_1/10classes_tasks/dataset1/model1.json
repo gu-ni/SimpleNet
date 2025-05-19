@@ -1,0 +1,38 @@
+{
+    "continual_ad_Glasses-case": {
+        "image_auroc": 0.5942541147213769,
+        "pixel_ap": 0.004279470027474621,
+        "normal_count": 501,
+        "anomaly_count": 549
+    },
+    "continual_ad_Candy": {
+        "image_auroc": 0.602743457150752,
+        "pixel_ap": 0.01792756509953356,
+        "normal_count": 517,
+        "anomaly_count": 490
+    },
+    "viaduct_36 redon needle": {
+        "image_auroc": 0.7882716049382715,
+        "pixel_ap": 0.05782091390328012,
+        "normal_count": 180,
+        "anomaly_count": 63
+    },
+    "viaduct_29 threaded fitting": {
+        "image_auroc": 0.6026881720430107,
+        "pixel_ap": 0.004469144796960618,
+        "normal_count": 90,
+        "anomaly_count": 62
+    },
+    "mvtec_toothbrush": {
+        "image_auroc": 0.7041666666666667,
+        "pixel_ap": 0.21808056619713279,
+        "normal_count": 12,
+        "anomaly_count": 20
+    },
+    "mvtec_cable": {
+        "image_auroc": 0.6810344827586207,
+        "pixel_ap": 0.1237586941754623,
+        "normal_count": 58,
+        "anomaly_count": 82
+    }
+}

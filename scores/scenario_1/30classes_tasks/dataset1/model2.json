@@ -1,0 +1,152 @@
+{
+    "mpdd_bracket_white": {
+        "image_auroc": 0.4433333333333333,
+        "pixel_ap": 1.1539531824079857e-05,
+        "normal_count": 30,
+        "anomaly_count": 20
+    },
+    "viaduct_21 cylinder screw": {
+        "image_auroc": 0.8032828282828283,
+        "pixel_ap": 0.011056826362793287,
+        "normal_count": 180,
+        "anomaly_count": 22
+    },
+    "continual_ad_Watermelon": {
+        "image_auroc": 0.6504998369664627,
+        "pixel_ap": 0.044238417621551646,
+        "normal_count": 497,
+        "anomaly_count": 506
+    },
+    "continual_ad_Egg": {
+        "image_auroc": 0.7932482571483069,
+        "pixel_ap": 0.1131907015821828,
+        "normal_count": 662,
+        "anomaly_count": 491
+    },
+    "viaduct_00 shredded corn rough": {
+        "image_auroc": 0.759423076923077,
+        "pixel_ap": 0.09383144912306803,
+        "normal_count": 80,
+        "anomaly_count": 130
+    },
+    "continual_ad_Spoon": {
+        "image_auroc": 0.554472416033238,
+        "pixel_ap": 0.005285894454511614,
+        "normal_count": 527,
+        "anomaly_count": 517
+    },
+    "viaduct_35 pink tablet": {
+        "image_auroc": 0.8276666666666667,
+        "pixel_ap": 0.27338696030307796,
+        "normal_count": 50,
+        "anomaly_count": 60
+    },
+    "viaduct_05 cable end sleeve": {
+        "image_auroc": 0.4463095238095238,
+        "pixel_ap": 0.005394665405631174,
+        "normal_count": 210,
+        "anomaly_count": 40
+    },
+    "continual_ad_Calculator": {
+        "image_auroc": 0.7729446640316207,
+        "pixel_ap": 0.004669039524261949,
+        "normal_count": 506,
+        "anomaly_count": 500
+    },
+    "viaduct_30 valve handle blue": {
+        "image_auroc": 0.5471428571428572,
+        "pixel_ap": 0.0023692708901251213,
+        "normal_count": 50,
+        "anomaly_count": 14
+    },
+    "viaduct_23 pipe clamp": {
+        "image_auroc": 0.5410526315789473,
+        "pixel_ap": 0.021416272038586537,
+        "normal_count": 50,
+        "anomaly_count": 19
+    },
+    "mvtec_toothbrush": {
+        "image_auroc": 0.6833333333333333,
+        "pixel_ap": 0.18326988084426482,
+        "normal_count": 12,
+        "anomaly_count": 20
+    },
+    "btad_02": {
+        "image_auroc": 0.5782456140350878,
+        "pixel_ap": 0.0875499769865147,
+        "normal_count": 30,
+        "anomaly_count": 190
+    },
+    "continual_ad_Eraser": {
+        "image_auroc": 0.20640924251280818,
+        "pixel_ap": 0.0129915653220232,
+        "normal_count": 458,
+        "anomaly_count": 508
+    },
+    "continual_ad_Mango": {
+        "image_auroc": 0.9195787329831708,
+        "pixel_ap": 0.022523015058514013,
+        "normal_count": 456,
+        "anomaly_count": 491
+    },
+    "viaduct_36 redon needle": {
+        "image_auroc": 0.6652557319223986,
+        "pixel_ap": 0.009810155844192944,
+        "normal_count": 180,
+        "anomaly_count": 63
+    },
+    "viaduct_13 socket housing": {
+        "image_auroc": 0.5763313609467455,
+        "pixel_ap": 0.026336831901312304,
+        "normal_count": 65,
+        "anomaly_count": 52
+    },
+    "continual_ad_Candy": {
+        "image_auroc": 0.5968183791891998,
+        "pixel_ap": 0.01936636118446055,
+        "normal_count": 517,
+        "anomaly_count": 490
+    },
+    "continual_ad_Mouse": {
+        "image_auroc": 0.8525291600726803,
+        "pixel_ap": 0.18188366004798345,
+        "normal_count": 517,
+        "anomaly_count": 495
+    },
+    "viaduct_34 oblong pill": {
+        "image_auroc": 0.5874649859943977,
+        "pixel_ap": 0.06923986518043836,
+        "normal_count": 105,
+        "anomaly_count": 136
+    },
+    "visa_pcb3": {
+        "image_auroc": 0.6378437843784379,
+        "pixel_ap": 0.0,
+        "normal_count": 101,
+        "anomaly_count": 90
+    },
+    "mpdd_bracket_black": {
+        "image_auroc": 0.5320945945945946,
+        "pixel_ap": 0.000647008049576737,
+        "normal_count": 32,
+        "anomaly_count": 37
+    },
+    "viaduct_29 threaded fitting": {
+        "image_auroc": 0.5948028673835125,
+        "pixel_ap": 0.0038891762762193393,
+        "normal_count": 90,
+        "anomaly_count": 62
+    },
+    "mvtec_carpet": {
+        "image_auroc": 0.5027124773960218,
+        "pixel_ap": 0.08023176466048954,
+        "normal_count": 28,
+        "anomaly_count": 79
+    },
+    "continual_ad_Glasses-case": {
+        "image_auroc": 0.5852957109460497,
+        "pixel_ap": 0.003922889494488874,
+        "normal_count": 501,
+        "anomaly_count": 549
+    }
+}

@@ -1,0 +1,56 @@
+{
+    "continual_ad_Eraser": {
+        "image_auroc": 0.41731423855860816,
+        "pixel_ap": 0.015056409040848526,
+        "normal_count": 458,
+        "anomaly_count": 508
+    },
+    "mpdd_bracket_brown": {
+        "image_auroc": 0.5009380863039399,
+        "pixel_ap": 0.005968900220338956,
+        "normal_count": 26,
+        "anomaly_count": 41
+    },
+    "mpdd_connector": {
+        "image_auroc": 0.5666666666666667,
+        "pixel_ap": 0.003695570582373545,
+        "normal_count": 30,
+        "anomaly_count": 4
+    },
+    "viaduct_38 round pill": {
+        "image_auroc": 0.8526829268292683,
+        "pixel_ap": 0.24344923903573265,
+        "normal_count": 50,
+        "anomaly_count": 82
+    },
+    "continual_ad_Toothpaste": {
+        "image_auroc": 0.3916617555948442,
+        "pixel_ap": 0.009275180534113575,
+        "normal_count": 513,
+        "anomaly_count": 516
+    },
+    "continual_ad_Ruler": {
+        "image_auroc": 0.8484196566713329,
+        "pixel_ap": 0.0021561346036780356,
+        "normal_count": 277,
+        "anomaly_count": 490
+    },
+    "viaduct_22 device box": {
+        "image_auroc": 0.495,
+        "pixel_ap": 0.0001852423932443811,
+        "normal_count": 50,
+        "anomaly_count": 36
+    },
+    "viaduct_20 tea bag": {
+        "image_auroc": 0.6673015873015873,
+        "pixel_ap": 0.05484061567427283,
+        "normal_count": 140,
+        "anomaly_count": 90
+    },
+    "viaduct_23 pipe clamp": {
+        "image_auroc": 0.5852631578947368,
+        "pixel_ap": 0.07413795739092242,
+        "normal_count": 50,
+        "anomaly_count": 19
+    }
+}

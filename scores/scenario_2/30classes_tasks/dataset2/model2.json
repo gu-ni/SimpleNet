@@ -1,0 +1,128 @@
+{
+    "btad_01": {
+        "image_auroc": 0.7802197802197802,
+        "pixel_ap": 0.024401351829754628,
+        "normal_count": 21,
+        "anomaly_count": 39
+    },
+    "viaduct_22 device box": {
+        "image_auroc": 0.5083333333333333,
+        "pixel_ap": 0.0010093016333894943,
+        "normal_count": 50,
+        "anomaly_count": 36
+    },
+    "continual_ad_Band-aid": {
+        "image_auroc": 0.8320253805285751,
+        "pixel_ap": 0.018852417329170736,
+        "normal_count": 511,
+        "anomaly_count": 491
+    },
+    "viaduct_45 damper large": {
+        "image_auroc": 0.6511538461538462,
+        "pixel_ap": 0.2656877596900347,
+        "normal_count": 65,
+        "anomaly_count": 40
+    },
+    "viaduct_28 key": {
+        "image_auroc": 0.34555555555555556,
+        "pixel_ap": 0.0659837262671298,
+        "normal_count": 90,
+        "anomaly_count": 30
+    },
+    "viaduct_08 ethernet connector": {
+        "image_auroc": 0.534,
+        "pixel_ap": 0.07079063341288279,
+        "normal_count": 50,
+        "anomaly_count": 30
+    },
+    "continual_ad_Energy-bar": {
+        "image_auroc": 0.602272344911899,
+        "pixel_ap": 0.11520249102987971,
+        "normal_count": 329,
+        "anomaly_count": 542
+    },
+    "continual_ad_Eraser": {
+        "image_auroc": 0.3607347935219888,
+        "pixel_ap": 0.05405234474388708,
+        "normal_count": 458,
+        "anomaly_count": 508
+    },
+    "continual_ad_Flash-drive": {
+        "image_auroc": 0.663764077557181,
+        "pixel_ap": 0.10768894785798327,
+        "normal_count": 522,
+        "anomaly_count": 495
+    },
+    "continual_ad_Ruler": {
+        "image_auroc": 0.7640167980549621,
+        "pixel_ap": 0.003608042988446031,
+        "normal_count": 277,
+        "anomaly_count": 490
+    },
+    "viaduct_43 paperclip": {
+        "image_auroc": 0.5441558441558442,
+        "pixel_ap": 0.0392570277112008,
+        "normal_count": 110,
+        "anomaly_count": 63
+    },
+    "continual_ad_Mouse": {
+        "image_auroc": 0.8650684797686732,
+        "pixel_ap": 0.17416741082270099,
+        "normal_count": 517,
+        "anomaly_count": 495
+    },
+    "mpdd_connector": {
+        "image_auroc": 0.9416666666666667,
+        "pixel_ap": 0.05831055715652711,
+        "normal_count": 30,
+        "anomaly_count": 4
+    },
+    "btad_03": {
+        "image_auroc": 0.7315322580645162,
+        "pixel_ap": 0.014960692889806967,
+        "normal_count": 400,
+        "anomaly_count": 31
+    },
+    "continual_ad_Calculator": {
+        "image_auroc": 0.8110158102766798,
+        "pixel_ap": 0.0023012993216584066,
+        "normal_count": 506,
+        "anomaly_count": 500
+    },
+    "viaduct_24 pan screw": {
+        "image_auroc": 0.41769230769230764,
+        "pixel_ap": 0.005073046429415921,
+        "normal_count": 130,
+        "anomaly_count": 100
+    },
+    "continual_ad_Cup": {
+        "image_auroc": 0.47415337540032343,
+        "pixel_ap": 0.020225198754325227,
+        "normal_count": 517,
+        "anomaly_count": 488
+    },
+    "viaduct_14 terminal block A": {
+        "image_auroc": 0.4982857142857143,
+        "pixel_ap": 0.002134235035201931,
+        "normal_count": 105,
+        "anomaly_count": 75
+    },
+    "viaduct_26 hose screw fitting": {
+        "image_auroc": 0.43157894736842106,
+        "pixel_ap": 0.006134473038962463,
+        "normal_count": 50,
+        "anomaly_count": 19
+    },
+    "continual_ad_Dollar": {
+        "image_auroc": 0.6921989707694378,
+        "pixel_ap": 0.03617734301473855,
+        "normal_count": 391,
+        "anomaly_count": 494
+    },
+    "viaduct_02 shredded corn fine": {
+        "image_auroc": 0.5869446343130554,
+        "pixel_ap": 0.018657119473982086,
+        "normal_count": 110,
+        "anomaly_count": 133
+    }
+}

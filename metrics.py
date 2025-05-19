@@ -180,3 +180,53 @@ def compute_pro(masks, amaps, num_th=200):
 
     pro_auc = metrics.auc(df["fpr"], df["pro"])
     return pro_auc"""
+    
+    
+    
+    
+
+
+def compute_imagewise_retrieval_metrics_custom(anomaly_prediction_weights, anomaly_ground_truth_labels):
+    """
+    Computes image-wise AUROC.
+
+    Args:
+        anomaly_prediction_weights: [np.array or list] [N] Assignment weights
+                                    per image. Higher indicates higher
+                                    probability of being an anomaly.
+        anomaly_ground_truth_labels: [np.array or list] [N] Binary labels - 1
+                                    if image is an anomaly, 0 if not.
+    Returns:
+        dict with "auroc"
+    """
+    auroc = metrics.roc_auc_score(
+        anomaly_ground_truth_labels, anomaly_prediction_weights
+    )
+    return {"auroc": auroc}
+
+
+def compute_pixelwise_retrieval_metrics_custom(anomaly_segmentations, ground_truth_masks):
+    """
+    Computes pixel-wise AUROC and pixel-wise AP.
+
+    Args:
+        anomaly_segmentations: [list of np.arrays or np.array] [NxHxW]
+        ground_truth_masks: [list of np.arrays or np.array] [NxHxW]
+    Returns:
+        dict with "auroc" and "ap"
+    """
+    if isinstance(anomaly_segmentations, list):
+        anomaly_segmentations = np.stack(anomaly_segmentations)
+    if isinstance(ground_truth_masks, list):
+        ground_truth_masks = np.stack(ground_truth_masks)
+
+    flat_anomaly_segmentations = anomaly_segmentations.ravel()
+    flat_ground_truth_masks = ground_truth_masks.ravel()
+
+    ap = metrics.average_precision_score(
+        flat_ground_truth_masks.astype(int), flat_anomaly_segmentations
+    )
+
+    return {
+        "ap": ap,
+    }

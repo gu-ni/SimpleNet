@@ -1,0 +1,26 @@
+{
+    "viaduct_34 oblong pill": {
+        "image_auroc": 0.7282212885154062,
+        "pixel_ap": 0.16743308338167226,
+        "normal_count": 105,
+        "anomaly_count": 136
+    },
+    "viaduct_28 key": {
+        "image_auroc": 0.4444444444444445,
+        "pixel_ap": 0.06968716549230099,
+        "normal_count": 90,
+        "anomaly_count": 30
+    },
+    "continual_ad_Mango": {
+        "image_auroc": 0.9164522814163719,
+        "pixel_ap": 0.03065620034739649,
+        "normal_count": 456,
+        "anomaly_count": 491
+    },
+    "mpdd_connector": {
+        "image_auroc": 0.7,
+        "pixel_ap": 0.004716335702775209,
+        "normal_count": 30,
+        "anomaly_count": 4
+    }
+}

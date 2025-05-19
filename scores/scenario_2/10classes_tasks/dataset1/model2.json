@@ -1,0 +1,50 @@
+{
+    "viaduct_28 key": {
+        "image_auroc": 0.31962962962962965,
+        "pixel_ap": 0.0668609899151004,
+        "normal_count": 90,
+        "anomaly_count": 30
+    },
+    "continual_ad_Flash-drive": {
+        "image_auroc": 0.6579240682688958,
+        "pixel_ap": 0.02856675312568884,
+        "normal_count": 522,
+        "anomaly_count": 495
+    },
+    "btad_01": {
+        "image_auroc": 0.645909645909646,
+        "pixel_ap": 0.10583432669765935,
+        "normal_count": 21,
+        "anomaly_count": 39
+    },
+    "viaduct_11 ring cable lug": {
+        "image_auroc": 0.49298469387755106,
+        "pixel_ap": 0.018784690059130686,
+        "normal_count": 140,
+        "anomaly_count": 56
+    },
+    "viaduct_43 paperclip": {
+        "image_auroc": 0.525974025974026,
+        "pixel_ap": 0.049738986477497825,
+        "normal_count": 110,
+        "anomaly_count": 63
+    },
+    "viaduct_05 cable end sleeve": {
+        "image_auroc": 0.4169047619047619,
+        "pixel_ap": 0.004841828930583688,
+        "normal_count": 210,
+        "anomaly_count": 40
+    },
+    "viaduct_14 terminal block A": {
+        "image_auroc": 0.4915555555555555,
+        "pixel_ap": 0.0033049305283868726,
+        "normal_count": 105,
+        "anomaly_count": 75
+    },
+    "continual_ad_Cup": {
+        "image_auroc": 0.42551209690205155,
+        "pixel_ap": 0.014631108698117746,
+        "normal_count": 517,
+        "anomaly_count": 488
+    }
+}

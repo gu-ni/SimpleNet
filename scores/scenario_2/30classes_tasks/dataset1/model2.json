@@ -1,0 +1,146 @@
+{
+    "viaduct_11 ring cable lug": {
+        "image_auroc": 0.4909438775510204,
+        "pixel_ap": 0.020726839512673973,
+        "normal_count": 140,
+        "anomaly_count": 56
+    },
+    "viaduct_39 self-tapping bolt": {
+        "image_auroc": 0.5142857142857145,
+        "pixel_ap": 0.04773344755494833,
+        "normal_count": 140,
+        "anomaly_count": 140
+    },
+    "continual_ad_Fork": {
+        "image_auroc": 0.5625342045625672,
+        "pixel_ap": 0.018390559706203843,
+        "normal_count": 537,
+        "anomaly_count": 507
+    },
+    "continual_ad_Candy": {
+        "image_auroc": 0.5542336083369519,
+        "pixel_ap": 0.02017502322057395,
+        "normal_count": 517,
+        "anomaly_count": 490
+    },
+    "viaduct_38 round pill": {
+        "image_auroc": 0.41219512195121955,
+        "pixel_ap": 0.10937620434844765,
+        "normal_count": 50,
+        "anomaly_count": 82
+    },
+    "viaduct_47 mains tester": {
+        "image_auroc": 0.572,
+        "pixel_ap": 0.00027220980186913325,
+        "normal_count": 50,
+        "anomaly_count": 20
+    },
+    "viaduct_20 tea bag": {
+        "image_auroc": 0.496031746031746,
+        "pixel_ap": 0.018567597466992384,
+        "normal_count": 140,
+        "anomaly_count": 90
+    },
+    "viaduct_27 L-fitting": {
+        "image_auroc": 0.58875,
+        "pixel_ap": 0.0020946161058674868,
+        "normal_count": 50,
+        "anomaly_count": 16
+    },
+    "continual_ad_Egg": {
+        "image_auroc": 0.6729253450323343,
+        "pixel_ap": 0.17364003582666335,
+        "normal_count": 662,
+        "anomaly_count": 491
+    },
+    "viaduct_48 saw blade": {
+        "image_auroc": 0.5309999999999999,
+        "pixel_ap": 0.0006613782314792694,
+        "normal_count": 50,
+        "anomaly_count": 20
+    },
+    "viaduct_34 oblong pill": {
+        "image_auroc": 0.4955182072829132,
+        "pixel_ap": 0.008647671405479968,
+        "normal_count": 105,
+        "anomaly_count": 136
+    },
+    "continual_ad_Mango": {
+        "image_auroc": 0.6924286275770893,
+        "pixel_ap": 0.025689758785459448,
+        "normal_count": 456,
+        "anomaly_count": 491
+    },
+    "continual_ad_Watermelon": {
+        "image_auroc": 0.5713927835789441,
+        "pixel_ap": 0.03392603434134467,
+        "normal_count": 497,
+        "anomaly_count": 506
+    },
+    "viaduct_12 rotary encoder": {
+        "image_auroc": 0.4463157894736842,
+        "pixel_ap": 0.004820407175808152,
+        "normal_count": 50,
+        "anomaly_count": 19
+    },
+    "viaduct_40 surgical mask": {
+        "image_auroc": 0.5454897406116919,
+        "pixel_ap": 0.0001870159959633026,
+        "normal_count": 105,
+        "anomaly_count": 123
+    },
+    "viaduct_13 socket housing": {
+        "image_auroc": 0.4695266272189349,
+        "pixel_ap": 0.009694522964423039,
+        "normal_count": 65,
+        "anomaly_count": 52
+    },
+    "continual_ad_Toothpaste": {
+        "image_auroc": 0.4228281729301721,
+        "pixel_ap": 0.00818492668312487,
+        "normal_count": 513,
+        "anomaly_count": 516
+    },
+    "mpdd_bracket_brown": {
+        "image_auroc": 0.6782363977485929,
+        "pixel_ap": 0.013646821442690128,
+        "normal_count": 26,
+        "anomaly_count": 41
+    },
+    "viaduct_07 d-sub connector": {
+        "image_auroc": 0.46259398496240606,
+        "pixel_ap": 0.0011386026918503718,
+        "normal_count": 140,
+        "anomaly_count": 38
+    },
+    "viaduct_30 valve handle blue": {
+        "image_auroc": 0.48428571428571426,
+        "pixel_ap": 0.0019168197545216816,
+        "normal_count": 50,
+        "anomaly_count": 14
+    },
+    "mpdd_tubes": {
+        "image_auroc": 0.766949152542373,
+        "pixel_ap": 0.1448580545535146,
+        "normal_count": 32,
+        "anomaly_count": 59
+    },
+    "viaduct_23 pipe clamp": {
+        "image_auroc": 0.4221052631578947,
+        "pixel_ap": 0.020786979356192652,
+        "normal_count": 50,
+        "anomaly_count": 19
+    },
+    "viaduct_05 cable end sleeve": {
+        "image_auroc": 0.47202380952380957,
+        "pixel_ap": 0.009100289437790872,
+        "normal_count": 210,
+        "anomaly_count": 40
+    },
+    "viaduct_41 white tablet": {
+        "image_auroc": 0.5922,
+        "pixel_ap": 0.021029306096112022,
+        "normal_count": 50,
+        "anomaly_count": 100
+    }
+}

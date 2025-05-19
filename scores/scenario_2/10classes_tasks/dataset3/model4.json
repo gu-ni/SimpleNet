@@ -1,0 +1,56 @@
+{
+    "viaduct_41 white tablet": {
+        "image_auroc": 0.5022,
+        "pixel_ap": 0.01485276905987619,
+        "normal_count": 50,
+        "anomaly_count": 100
+    },
+    "viaduct_02 shredded corn fine": {
+        "image_auroc": 0.8311004784688995,
+        "pixel_ap": 0.10724118016610842,
+        "normal_count": 110,
+        "anomaly_count": 133
+    },
+    "continual_ad_Energy-bar": {
+        "image_auroc": 0.5502753507778239,
+        "pixel_ap": 0.09604434411097411,
+        "normal_count": 329,
+        "anomaly_count": 542
+    },
+    "continual_ad_Mouse": {
+        "image_auroc": 0.8672723365179846,
+        "pixel_ap": 0.20439664359849466,
+        "normal_count": 517,
+        "anomaly_count": 495
+    },
+    "continual_ad_Egg": {
+        "image_auroc": 0.7861722485094234,
+        "pixel_ap": 0.082382492708451,
+        "normal_count": 662,
+        "anomaly_count": 491
+    },
+    "continual_ad_Mango": {
+        "image_auroc": 0.9214010076106764,
+        "pixel_ap": 0.021142159718126836,
+        "normal_count": 456,
+        "anomaly_count": 491
+    },
+    "viaduct_08 ethernet connector": {
+        "image_auroc": 0.5533333333333332,
+        "pixel_ap": 0.02593008113881733,
+        "normal_count": 50,
+        "anomaly_count": 30
+    },
+    "viaduct_07 d-sub connector": {
+        "image_auroc": 0.5103383458646616,
+        "pixel_ap": 0.001087606307198567,
+        "normal_count": 140,
+        "anomaly_count": 38
+    },
+    "continual_ad_Candy": {
+        "image_auroc": 0.5491809102751353,
+        "pixel_ap": 0.014096450319272888,
+        "normal_count": 517,
+        "anomaly_count": 490
+    }
+}

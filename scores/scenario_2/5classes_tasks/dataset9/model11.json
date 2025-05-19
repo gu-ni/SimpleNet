@@ -1,0 +1,20 @@
+{
+    "continual_ad_Cup": {
+        "image_auroc": 0.45074040016488565,
+        "pixel_ap": 0.008812822651198598,
+        "normal_count": 517,
+        "anomaly_count": 488
+    },
+    "viaduct_41 white tablet": {
+        "image_auroc": 0.506,
+        "pixel_ap": 0.030693030180354318,
+        "normal_count": 50,
+        "anomaly_count": 100
+    },
+    "btad_01": {
+        "image_auroc": 0.46764346764346765,
+        "pixel_ap": 0.06744099732523282,
+        "normal_count": 21,
+        "anomaly_count": 39
+    }
+}

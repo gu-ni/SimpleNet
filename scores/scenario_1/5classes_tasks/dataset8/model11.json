@@ -1,0 +1,20 @@
+{
+    "mvtec_toothbrush": {
+        "image_auroc": 0.6625,
+        "pixel_ap": 0.1065731647339607,
+        "normal_count": 12,
+        "anomaly_count": 20
+    },
+    "continual_ad_Spoon": {
+        "image_auroc": 0.5471392025956199,
+        "pixel_ap": 0.005151009463722438,
+        "normal_count": 527,
+        "anomaly_count": 517
+    },
+    "viaduct_11 ring cable lug": {
+        "image_auroc": 0.4871173469387755,
+        "pixel_ap": 0.014935812844128767,
+        "normal_count": 140,
+        "anomaly_count": 56
+    }
+}

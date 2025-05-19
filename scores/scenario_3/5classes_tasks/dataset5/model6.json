@@ -1,0 +1,20 @@
+{
+    "viaduct_44 tack": {
+        "image_auroc": 0.6187956204379562,
+        "pixel_ap": 0.05528630031821057,
+        "normal_count": 160,
+        "anomaly_count": 137
+    },
+    "viaduct_31 valve handle red": {
+        "image_auroc": 0.6305555555555555,
+        "pixel_ap": 0.0008854521808625216,
+        "normal_count": 45,
+        "anomaly_count": 16
+    },
+    "viaduct_11 ring cable lug": {
+        "image_auroc": 0.5408163265306122,
+        "pixel_ap": 0.04587987576329108,
+        "normal_count": 140,
+        "anomaly_count": 56
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "mvtec_carpet": {
+        "image_auroc": 0.48508137432188064,
+        "pixel_ap": 0.07040237337732883,
+        "normal_count": 28,
+        "anomaly_count": 79
+    },
+    "viaduct_01 shredded corn medium": {
+        "image_auroc": 0.7757041251778094,
+        "pixel_ap": 0.022916203989163254,
+        "normal_count": 185,
+        "anomaly_count": 95
+    },
+    "visa_pcb3": {
+        "image_auroc": 0.6444444444444444,
+        "pixel_ap": 0.0,
+        "normal_count": 101,
+        "anomaly_count": 90
+    }
+}

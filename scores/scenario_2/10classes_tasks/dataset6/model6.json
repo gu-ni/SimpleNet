@@ -1,0 +1,44 @@
+{
+    "btad_03": {
+        "image_auroc": 0.9039516129032258,
+        "pixel_ap": 0.041144730595620335,
+        "normal_count": 400,
+        "anomaly_count": 31
+    },
+    "viaduct_40 surgical mask": {
+        "image_auroc": 0.521641502129307,
+        "pixel_ap": 9.119525900387263e-05,
+        "normal_count": 105,
+        "anomaly_count": 123
+    },
+    "viaduct_39 self-tapping bolt": {
+        "image_auroc": 0.6491326530612245,
+        "pixel_ap": 0.13506975290622078,
+        "normal_count": 140,
+        "anomaly_count": 140
+    },
+    "viaduct_27 L-fitting": {
+        "image_auroc": 0.55,
+        "pixel_ap": 0.0036178511580404597,
+        "normal_count": 50,
+        "anomaly_count": 16
+    },
+    "viaduct_12 rotary encoder": {
+        "image_auroc": 0.36210526315789476,
+        "pixel_ap": 0.00367510799093385,
+        "normal_count": 50,
+        "anomaly_count": 19
+    },
+    "continual_ad_Dollar": {
+        "image_auroc": 0.744848669973182,
+        "pixel_ap": 0.022994277572503927,
+        "normal_count": 391,
+        "anomaly_count": 494
+    },
+    "continual_ad_Calculator": {
+        "image_auroc": 0.8552727272727272,
+        "pixel_ap": 0.00203489037341115,
+        "normal_count": 506,
+        "anomaly_count": 500
+    }
+}

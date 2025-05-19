@@ -1,0 +1,32 @@
+{
+    "viaduct_45 damper large": {
+        "image_auroc": 0.6334615384615384,
+        "pixel_ap": 0.08715176947928785,
+        "normal_count": 65,
+        "anomaly_count": 40
+    },
+    "viaduct_26 hose screw fitting": {
+        "image_auroc": 0.38315789473684214,
+        "pixel_ap": 0.005507481972291245,
+        "normal_count": 50,
+        "anomaly_count": 19
+    },
+    "viaduct_24 pan screw": {
+        "image_auroc": 0.5021538461538462,
+        "pixel_ap": 0.0006965593489539329,
+        "normal_count": 130,
+        "anomaly_count": 100
+    },
+    "mpdd_tubes": {
+        "image_auroc": 0.4014830508474576,
+        "pixel_ap": 0.008015841320050187,
+        "normal_count": 32,
+        "anomaly_count": 59
+    },
+    "viaduct_34 oblong pill": {
+        "image_auroc": 0.421078431372549,
+        "pixel_ap": 0.025283903352664883,
+        "normal_count": 105,
+        "anomaly_count": 136
+    }
+}

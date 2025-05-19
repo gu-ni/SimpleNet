@@ -1,0 +1,140 @@
+{
+    "mvtec_cable": {
+        "image_auroc": 0.6719932716568545,
+        "pixel_ap": 0.1288749918631919,
+        "normal_count": 58,
+        "anomaly_count": 82
+    },
+    "viaduct_18 raspberry": {
+        "image_auroc": 0.2930672268907563,
+        "pixel_ap": 0.051052204631735904,
+        "normal_count": 170,
+        "anomaly_count": 84
+    },
+    "visa_pcb2": {
+        "image_auroc": 0.6477777777777779,
+        "pixel_ap": 0.0,
+        "normal_count": 100,
+        "anomaly_count": 90
+    },
+    "viaduct_17 cherry": {
+        "image_auroc": 0.6077597402597402,
+        "pixel_ap": 0.011874490095883755,
+        "normal_count": 275,
+        "anomaly_count": 112
+    },
+    "mvtec_tile": {
+        "image_auroc": 0.8726453726453727,
+        "pixel_ap": 0.2606979115667283,
+        "normal_count": 33,
+        "anomaly_count": 74
+    },
+    "continual_ad_Notebook": {
+        "image_auroc": 0.42193367914450286,
+        "pixel_ap": 0.010863900650748428,
+        "normal_count": 354,
+        "anomaly_count": 513
+    },
+    "viaduct_08 ethernet connector": {
+        "image_auroc": 0.5206666666666667,
+        "pixel_ap": 0.02230304252475494,
+        "normal_count": 50,
+        "anomaly_count": 30
+    },
+    "visa_fryum": {
+        "image_auroc": 0.7148888888888888,
+        "pixel_ap": 0.0,
+        "normal_count": 50,
+        "anomaly_count": 90
+    },
+    "viaduct_11 ring cable lug": {
+        "image_auroc": 0.4649234693877552,
+        "pixel_ap": 0.028139949200668958,
+        "normal_count": 140,
+        "anomaly_count": 56
+    },
+    "viaduct_24 pan screw": {
+        "image_auroc": 0.43453846153846154,
+        "pixel_ap": 0.003409232180523146,
+        "normal_count": 130,
+        "anomaly_count": 100
+    },
+    "visa_capsules": {
+        "image_auroc": 0.4094444444444444,
+        "pixel_ap": 0.0,
+        "normal_count": 60,
+        "anomaly_count": 90
+    },
+    "viaduct_14 terminal block A": {
+        "image_auroc": 0.5036190476190476,
+        "pixel_ap": 0.0036744322607746805,
+        "normal_count": 105,
+        "anomaly_count": 75
+    },
+    "continual_ad_Food-container": {
+        "image_auroc": 0.49138351423627497,
+        "pixel_ap": 0.027372031376411483,
+        "normal_count": 520,
+        "anomaly_count": 489
+    },
+    "viaduct_25 reinforcing sleeve": {
+        "image_auroc": 0.5127272727272727,
+        "pixel_ap": 0.014551627890719931,
+        "normal_count": 50,
+        "anomaly_count": 11
+    },
+    "mvtec_capsule": {
+        "image_auroc": 0.4747474747474748,
+        "pixel_ap": 0.06961303460656533,
+        "normal_count": 23,
+        "anomaly_count": 99
+    },
+    "viaduct_31 valve handle red": {
+        "image_auroc": 0.6208333333333333,
+        "pixel_ap": 0.0006944970769583055,
+        "normal_count": 45,
+        "anomaly_count": 16
+    },
+    "continual_ad_Cup": {
+        "image_auroc": 0.505315185337857,
+        "pixel_ap": 0.009273604178583847,
+        "normal_count": 517,
+        "anomaly_count": 488
+    },
+    "viaduct_04 battery tray": {
+        "image_auroc": 0.4584615384615384,
+        "pixel_ap": 0.006474271507064844,
+        "normal_count": 65,
+        "anomaly_count": 30
+    },
+    "mvtec_transistor": {
+        "image_auroc": 0.5988888888888889,
+        "pixel_ap": 0.10059831719418948,
+        "normal_count": 60,
+        "anomaly_count": 30
+    },
+    "visa_macaroni1": {
+        "image_auroc": 0.736,
+        "pixel_ap": 0.0,
+        "normal_count": 100,
+        "anomaly_count": 90
+    },
+    "viaduct_01 shredded corn medium": {
+        "image_auroc": 0.8198577524893315,
+        "pixel_ap": 0.11209119690748218,
+        "normal_count": 185,
+        "anomaly_count": 95
+    },
+    "viaduct_27 L-fitting": {
+        "image_auroc": 0.47000000000000003,
+        "pixel_ap": 0.0041990388153914345,
+        "normal_count": 50,
+        "anomaly_count": 16
+    },
+    "viaduct_32 bone pliers": {
+        "image_auroc": 0.5829257829257829,
+        "pixel_ap": 0.003954209595214489,
+        "normal_count": 185,
+        "anomaly_count": 63
+    }
+}

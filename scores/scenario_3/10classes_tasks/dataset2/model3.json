@@ -1,0 +1,44 @@
+{
+    "viaduct_08 ethernet connector": {
+        "image_auroc": 0.5266666666666666,
+        "pixel_ap": 0.03472490052101236,
+        "normal_count": 50,
+        "anomaly_count": 30
+    },
+    "btad_01": {
+        "image_auroc": 0.7619047619047619,
+        "pixel_ap": 0.1796361156280382,
+        "normal_count": 21,
+        "anomaly_count": 39
+    },
+    "viaduct_27 L-fitting": {
+        "image_auroc": 0.5525,
+        "pixel_ap": 0.005316183015076345,
+        "normal_count": 50,
+        "anomaly_count": 16
+    },
+    "mpdd_metal_plate": {
+        "image_auroc": 0.8026481715006305,
+        "pixel_ap": 0.5235121058750161,
+        "normal_count": 26,
+        "anomaly_count": 61
+    },
+    "viaduct_39 self-tapping bolt": {
+        "image_auroc": 0.6155612244897959,
+        "pixel_ap": 0.12259913301641241,
+        "normal_count": 140,
+        "anomaly_count": 140
+    },
+    "viaduct_48 saw blade": {
+        "image_auroc": 0.5,
+        "pixel_ap": 0.010798714364213523,
+        "normal_count": 50,
+        "anomaly_count": 20
+    },
+    "viaduct_30 valve handle blue": {
+        "image_auroc": 0.6014285714285714,
+        "pixel_ap": 0.0012073544860768787,
+        "normal_count": 50,
+        "anomaly_count": 14
+    }
+}
